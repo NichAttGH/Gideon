@@ -218,9 +218,9 @@ def check_progress(problems_path, output_path, progress_path):
         if answer == "Y":
             if os.path.exists(problems_path) and os.path.exists(output_path):
                 npg = read_progress(progress_path)
-                return npg
+                return npg, answer
         elif answer == "N":
-            return 0
+            return 0, answer
         else:
             print("Invalid input, please enter 'Y' for yes or 'N' for no.")
 
@@ -266,7 +266,7 @@ def generate_hash_list(hash_list_path, hash_list):
         for hash in hash_list:
             f.write(f"{hash}\n")
     
-def read_hash_list_to_list(hash_list_path):    
+def read_hash_list_to_list(hash_list_path, answer):    
     """
     Reads previously saved problem hashes from file into a list.
     
@@ -279,13 +279,14 @@ def read_hash_list_to_list(hash_list_path):
     Implementation Details:
     1. Initializes empty list for storing hashes
     2. Checks if hash file exists
-    3. If exists:
+    3. If there is a progress:
        - Opens file in read mode
        - Reads each line (hash)
        - Strips whitespace/newlines
        - Adds to hash list
-    4. If doesn't exist:
-       - Returns empty list
+    4. If there isn't a progress:
+       - Set empty the hash list
+    5. Return the hash list
     
     Usage:
     - Called when resuming interrupted generation
@@ -301,9 +302,11 @@ def read_hash_list_to_list(hash_list_path):
     
     # Check if the file exists and read the hashes
     if os.path.exists(hash_list_path):
-        with open(hash_list_path, 'r') as f:
-            hash_list = [line.strip() for line in f]
-
+        if answer == 'Y':
+            with open(hash_list_path, 'r') as f:
+                hash_list = [line.strip() for line in f]
+        elif answer == 'N':
+            hash_list = []
     return hash_list
 
 # ===== Generating PDDL Problem Files =====
@@ -562,10 +565,10 @@ def generate_problems(generator_path, num_problems, domain, problems_path, logs_
 
         print("Press one of these keys:\n - 'p' -> Pause the processing\n - 'r' -> Resume the processing\n - 's' -> Stop the processing and Exit")
         
-        npg = check_progress(problems_path, output_path, progress_path)
+        npg, answer = check_progress(problems_path, output_path, progress_path)
         
         if npg != 0:
-            hash_list = read_hash_list_to_list(hash_list_path)  # Needed to update hash list if you want to add more problems
+            hash_list = read_hash_list_to_list(hash_list_path, answer)  # Needed to update hash list if you want to add more problems
             
             # Add the Progress Bar
             with tqdm(initial=npg, total=num_problems, leave=True, desc="Generating problems", unit=" problem") as pbar:
@@ -610,7 +613,7 @@ def generate_problems(generator_path, num_problems, domain, problems_path, logs_
                     c += 1                          # Increases each time a problem is generated
 
         elif npg == 0:
-            hash_list = read_hash_list_to_list(hash_list_path)  # Needed to update hash list if you want to add more problems
+            hash_list = read_hash_list_to_list(hash_list_path, answer)  # Needed to update hash list if you want to add more problems
             
             # Add the Progress Bar
             with tqdm(total=num_problems, leave=True, desc="Generating problems", unit=" problem") as pbar:
