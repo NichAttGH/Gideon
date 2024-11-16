@@ -109,11 +109,34 @@ problem = Problem(
 - Handles interruptions gracefully
 - Preserves progress on interruption
 
-### 5. Usage Example
+### 5. How to install
+
+#### On Windows:
 
 ```bash
-python gpg.py -d domain.pddl -o output_directory -n 10
+pip install pddl
 ```
+
+#### On Ubuntu (used Ubuntu 20.04 for testing):
+
+```bash
+pip3 install pddl, keyboard, tqdm
+```
+
+### 6. Usage Example
+
+- On Windows:
+
+```bash
+python <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -n 10
+```
+
+- On Ubuntu (used Ubuntu 20.04 for testing):
+
+```bash
+sudo python3 <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -n 10
+```
+
 This would:
 1. Load domain.pddl
 2. Create output directory structure
