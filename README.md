@@ -113,19 +113,45 @@ problem = Problem(
 
 #### On Windows:
 
-```bash
-pip install pddl
-```
-
-#### On Ubuntu (used Ubuntu 20.04 for testing):
+1) Install [Python](https://www.python.org/downloads/) -> Tick "Add python.exe to PATH" and Select "Install Now"
+2) Install these packages:
 
 ```bash
 pip3 install pddl, keyboard, tqdm
 ```
 
-### 6. Usage Example
+3) Download this repository in your Workspace, or with git:
+
+```bash
+git clone https://github.com/NichAttGH/Master-Thesis.git
+```
+
+#### On Ubuntu (used Ubuntu 20.04 for testing):
+
+1) Install last version of Python
+2) Install these packages:
+
+```bash
+pip3 install pddl, keyboard, tqdm
+```
+
+3) Download this repository in your Workspace, or with git:
+
+```bash
+git clone https://github.com/NichAttGH/Master-Thesis.git
+```
+
+### 6. Usage and Example
 
 - On Windows:
+
+To see how many args are available, just use the command below:
+
+```bash
+python <path/to/gpg.py> -h
+```
+
+Example of usage:
 
 ```bash
 python <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -n 10
@@ -133,15 +159,37 @@ python <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -
 
 - On Ubuntu (used Ubuntu 20.04 for testing):
 
+To see how many args are available, just use the command below:
+
+```bash
+sudo python3 <path/to/gpg.py> -h
+```
+
+Example of usage:
+
 ```bash
 sudo python3 <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -n 10
 ```
 
-This would:
+**NOTICE**: for security reasons, Unix-like OS make the parent folder owned by root so you cannot delete the final output folder from CLI. Because of this I recommend using the command below to unlock the parent folder whenever you are done with the generator:
+
+```bash
+sudo chown -R $USER:$USER <path/to/father's_folder>
+```
+
+#### For both
+
+This example would:
 1. Load domain.pddl
 2. Create output directory structure
 3. Generate 10 unique problems
 4. Save problems and logs
 5. Allow interactive control during generation
+
+**NOTICE**: to generate only 1 PDDL problem file, use along with the rest of the command also:
+
+```bash
+-g <path/to/gpg.py>
+```
 
 The script is particularly useful for automated testing and benchmarking of PDDL planners, providing a way to generate several problem instances while maintaining control over the generation process.
