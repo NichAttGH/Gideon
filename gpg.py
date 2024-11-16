@@ -78,12 +78,12 @@ def stop_p():
     print("\nEnd processing...")
 
 # ===== Other Control Functions =====
-def final_output(c, t, problems_path):
+def final_output(i, t, problems_path):
     """
     Displays final statistics of the problem generation process.
     
     Args:
-        c (int): Count of successfully generated problems
+        i (int): Count of successfully generated problems
         t (float): Total time taken for generation (in seconds)
         problems_path (str): Directory path where problems were saved
     
@@ -107,7 +107,7 @@ def final_output(c, t, problems_path):
     Directory of generated problems: /path/to/problems
     Time required to generate problems: 23.45 seconds
     """
-    print(f"Number of generated problems: {c}")
+    print(f"Number of generated problems: {i}")
     print(f"Directory of generated problems: {problems_path}")
     print(f"Time required to generate problems: {t:.2f} seconds")
 
@@ -225,12 +225,12 @@ def check_progress(problems_path, output_path, progress_path):
             print("Invalid input, please enter 'Y' for yes or 'N' for no.")
 
 # ===== Log Function =====
-def generate_log_file(c, logs_path, problems_path, t):
+def generate_log_file(i, logs_path, problems_path, t):
     """
     Creates log file with generation statistics.
     
     Args:
-        c: Count of generated problems
+        i: Number of generated problems
         logs_path: Path to logs directory
         problems_path: Path to problems directory
         t: Time taken for generation
@@ -245,7 +245,7 @@ def generate_log_file(c, logs_path, problems_path, t):
     log_filename = f"{current_date}.txt"
     log_file_path = os.path.join(logs_path, log_filename)
     with open(log_file_path, 'w') as log_file:
-        log_file.write(f"Number of generated problems: {c}\n")
+        log_file.write(f"Number of generated problems: {i}\n")
         log_file.write(f"Directory of generated problems: {problems_path}\n")
         log_file.write(f"Time required to generate problems: {t:.2f} seconds")
 
@@ -580,18 +580,18 @@ def generate_problems(generator_path, num_problems, domain, problems_path, logs_
                     if stop:
                         t = pbar.format_dict['elapsed']         # Time required for the processing if the process is stopped
                         save_progress(i, progress_path)         # Save progress if stopped processing
-                        generate_log_file(c, logs_path, problems_path, t)   # Generate log file
+                        generate_log_file(i, logs_path, problems_path, t)   # Generate log file
                         generate_hash_list(hash_list_path, hash_list)       # Generate hash list file
-                        final_output(c, t, problems_path)       # Final output for the user
+                        final_output(i, t, problems_path)       # Final output for the user
                         raise SystemExit()
                     while pause:
                         time.sleep(0.1)  # Wait a moment before checking again the state
                         if stop:
                             t = pbar.format_dict['elapsed']         # Time required for the processing if the process is stopped
                             save_progress(i, progress_path)         # Save progress if stopped processing
-                            generate_log_file(c, logs_path, problems_path, t)   # Generate log file
+                            generate_log_file(i, logs_path, problems_path, t)   # Generate log file
                             generate_hash_list(hash_list_path, hash_list)       # Generate hash list file
-                            final_output(c, t, problems_path)       # Final output for the user
+                            final_output(i, t, problems_path)       # Final output for the user
                             raise SystemExit()
 
                     problem_name = f"{domain.name}_problem_00000{i + 1}"
@@ -625,18 +625,18 @@ def generate_problems(generator_path, num_problems, domain, problems_path, logs_
                     if stop:
                         t = pbar.format_dict['elapsed']         # Time required for the processing if the process is stopped
                         save_progress(i, progress_path)         # Save progress if stopped processing
-                        generate_log_file(c, logs_path, problems_path, t)   # Generate log file
+                        generate_log_file(i, logs_path, problems_path, t)   # Generate log file
                         generate_hash_list(hash_list_path, hash_list)       # Generate hash list file
-                        final_output(c, t, problems_path)       # Final output for the user
+                        final_output(i, t, problems_path)       # Final output for the user
                         raise SystemExit()
                     while pause:
                         time.sleep(0.1)  # Wait a moment before checking again the state
                         if stop:
                             t = pbar.format_dict['elapsed']         # Time required for the processing if the process is stopped
                             save_progress(i, progress_path)         # Save progress if stopped processing
-                            generate_log_file(c, logs_path, problems_path, t)   # Generate log file
+                            generate_log_file(i, logs_path, problems_path, t)   # Generate log file
                             generate_hash_list(hash_list_path, hash_list)       # Generate hash list file
-                            final_output(c, t, problems_path)       # Final output for the user
+                            final_output(i, t, problems_path)       # Final output for the user
                             raise SystemExit()
                         
                     problem_name = f"{domain.name}_problem_00000{i + 1}"
@@ -659,9 +659,9 @@ def generate_problems(generator_path, num_problems, domain, problems_path, logs_
 
         t = pbar.format_dict['elapsed']                     # Time required for the processing
         save_progress(i+1, progress_path)                   # Save progress if ended processing
-        generate_log_file(c, logs_path, problems_path, t)   # Generate log file
+        generate_log_file(i+1, logs_path, problems_path, t)   # Generate log file
         generate_hash_list(hash_list_path, hash_list)       # Generate hash list file
-        final_output(c, t, problems_path)                   # Final output for the user
+        final_output(i+1, t, problems_path)                   # Final output for the user
 
     elif num_problems == 1:
         problem_name = f"{domain.name}_problem_000001"
