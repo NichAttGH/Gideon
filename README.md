@@ -177,7 +177,7 @@ sudo python3 <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_direct
 sudo chown -R $USER:$USER <path/to/father's_folder>
 ```
 
-#### For both
+#### For both OS
 
 This example would:
 1. Load domain.pddl
