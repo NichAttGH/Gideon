@@ -1,7 +1,7 @@
 # Master-Thesis
 Here will be present the work done for my Master Thesis
 
-## How PDDL problem generator works:
+## PDDL problem generator:
 
 ### 1. Purpose
 
