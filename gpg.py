@@ -6,6 +6,7 @@ import shutil      # High-level file operations (copy, move)
 import hashlib     # For generating unique hashes of problems
 import keyboard    # Handling keyboard inputs for control
 import time, datetime  # Time tracking and timestamps
+import platform
 from tqdm import tqdm  # Progress bar visualization
 
 # PDDL-specific imports
@@ -703,6 +704,11 @@ def main(args):
 
     # Generate the problem files
     generate_problems(args.generator_path, args.num_problems, domain, problems_path, logs_path, output_path)
+
+    # Change the ownership of the output directory to the current user because the script is run with sudo
+    if platform.system() != "Windows":  # Check if the system is Unix-like (for example Linux, Ubuntu, macOS)
+        os.system(f"sudo chown -R $USER:$USER {args.output_dir}")
+
     print("All operations completed. Happy planning!")
 
 if __name__ == "__main__":
