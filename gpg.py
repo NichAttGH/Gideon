@@ -6,7 +6,7 @@ import shutil      # High-level file operations (copy, move)
 import hashlib     # For generating unique hashes of problems
 import keyboard    # Handling keyboard inputs for control
 import time, datetime  # Time tracking and timestamps
-import platform
+import platform    # Platform Informations
 from tqdm import tqdm  # Progress bar visualization
 
 # PDDL-specific imports
