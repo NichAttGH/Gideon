@@ -121,4 +121,4 @@ This would:
 4. Save problems and logs
 5. Allow interactive control during generation
 
-The script is particularly useful for automated testing and benchmarking of PDDL planners, providing a way to generate diverse problem instances while maintaining control over the generation process.
+The script is particularly useful for automated testing and benchmarking of PDDL planners, providing a way to generate several problem instances while maintaining control over the generation process.
