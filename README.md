@@ -114,10 +114,10 @@ problem = Problem(
 #### On Windows:
 
 1) Install [Python](https://www.python.org/downloads/) -> Tick "Add python.exe to PATH" and Select "Install Now"
-2) Install these packages:
+2) Install these packages (if you don't have pip installed, just install it before proceeding):
 
 ```bash
-pip3 install pddl, keyboard, tqdm
+pip3 install pddl, tqdm, pynput
 ```
 
 3) Download this repository in your Workspace, or with git:
@@ -129,10 +129,10 @@ git clone https://github.com/NichAttGH/Master-Thesis.git
 #### On Ubuntu (used Ubuntu 20.04 for testing):
 
 1) Install last version of Python
-2) Install these packages:
+2) Install these packages (if you don't have pip installed, just install it before proceeding):
 
 ```bash
-pip3 install pddl, keyboard, tqdm
+pip3 install pddl, tqdm, pynput
 ```
 
 3) Download this repository in your Workspace, or with git:
@@ -154,10 +154,10 @@ python <path/to/gpg.py> -h
 Example of usage:
 
 ```bash
-python <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -n 10
+python <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -j <path/to/json_file> -n 10
 ```
 
-- On Ubuntu (used Ubuntu 20.04 for testing):
+- On Ubuntu (used Ubuntu 22.04 for testing):
 
 To see how many args are available, just use the command below:
 
@@ -168,13 +168,7 @@ sudo python3 <path/to/gpg.py> -h
 Example of usage:
 
 ```bash
-sudo python3 <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -n 10
-```
-
-**NOTICE**: for security reasons, Unix-like OS make the parent folder owned by root so you cannot delete the final output folder from CLI. Because of this I recommend using the command below to unlock the parent folder whenever you are done with the generator:
-
-```bash
-sudo chown -R $USER:$USER <path/to/father's_folder>
+python3 <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -j <path/to/json_file> -n 10
 ```
 
 #### For both OS
