@@ -1,0 +1,56 @@
+{
+  "problem_prefix": "problem_prefix_here",
+  "domain_name": "domain_name_here",
+  "objects_pools": { // these are pools of objects, you can specify multiple pools for the same type. It doesn't matter if the objects in two pools overlap.
+    "<pool-name>": {
+      "object_type": "<type-name>",
+      "mutex": true or false, // if true, objects can be used only once
+      "sequential": true or false, // if true, objects are used in sequence, else they are used randomly, default false
+      "count": <integer> or [<min>, <max>], // how many objects of this type to generate in this pool
+      "name_prefix": "<prefix>", // pattern to generate names, a number will be appended sequentially starting from 1
+      "name_pattern": [<start>, <increment>] // optional alternative pattern to generate names, both integers    
+    },
+      // Additional pools...
+  },
+  "predicates_pools": {
+    "<pool_name>": {
+      // sometimes the parameters inside an object pool needs to be synchronized
+      // e.g., if I have in-hand link2 and in-hand link3, then in-centre joint2
+      // to enforce this we will use some tags, we use $ as a delimiter
+      // e.g., "link-pool$0", "joint-pool$0"
+      // -> once an object is chosen from link-pool list, the same index is used
+      // to pick and object from the joint-pool list
+      // joint-pool$0+1 or joint-pool$0-1 allows to pick adjacent objects and so on
+      // list are considered rings
+      "<predicate-name>": {
+        "count": <integer> or [<min>, <max>],
+        "args": [ordered list of objects pools names + sync tags],
+        "probability": <float> // optional, default 1.0 
+      },
+      // Additional pools...
+    },
+  },
+  "constant_initial_state": "PDDL_CODE_FOR_CONSTANT_INITIAL_STATE_PREDICATES", // this will be pasted as is in the initial state
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [[list of predicates pools names]], // for each list inside the list, only one pool can appear in the problem
+      "mutex_prob": [list of probabilities, floats], // optional, define probability for each mutex'd pool to be selected, elements must sum to 1, defaults to equal probabilities
+      "pools": [list of predicates pools names] // these predicates pools are always included
+    },
+    "functions": {
+      // Specifications for functions
+    }
+  },
+  "constant_goal_state": "PDDL_CODE_FOR_CONSTANT_GOAL_STATE_PREDICATES", // this will be pasted as is in the goal state
+  "goal_state": {
+    "predicates": {
+      // Specifications for randomization, works the same as init_state
+    },
+    "functions": {
+      // Specifications for functions
+    }
+  },
+  "constraints": {
+    // Constraints as needed
+  }
+}
