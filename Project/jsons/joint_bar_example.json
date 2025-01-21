@@ -1,0 +1,100 @@
+{
+  "problem_prefix": "joint_bar",
+  "domain_name": "joint_bar",
+  "objects_pools": {
+    "gripper_pool": {
+      "object_type": "gripper",
+      "mutex": true,
+      "sequential": true,
+      "count": 2,
+      "name_prefix": "g"
+    },
+    "link_pool": {
+      "object_type": "link",
+      "sequential": true,
+      "count": 4,
+      "name_prefix": "link"
+    },
+    "center_joint": {
+      "object_type": "joint",
+      "mutex": true,
+      "count": 1,
+      "name_prefix": "joint"
+    },
+    "joint_pool_initial": {
+      "object_type": "joint",
+      "mutex": true,
+      "sequential": true,
+      "count": 3,
+      "name_prefix": "joint"
+    },
+    "joint_pool_goal": {
+      "object_type": "joint",
+      "mutex": true,
+      "sequential": true,
+      "count": 3,
+      "name_prefix": "joint"
+    },
+    "angle_pool": {
+      "object_type": "angle",
+      "count": 24,
+      "name_prefix": "angle",
+      "name_pattern": [0, 15]
+    }
+  },
+  "predicates_pools": {
+    "grasped": {
+      "in-centre": {
+        "count": 1,
+        "args": ["center_joint$0"]
+      },
+      "in-hand": {
+        "count": 2,
+        "args": ["link_pool$0"]
+      },
+      "grasp": {
+        "count": 2,
+        "args": ["gripper_pool", "link_pool$0"]
+      }
+    },
+    "not-grasped": {
+      "in-centre": {
+        "count": 1,
+        "args": ["center_joint"]
+      },
+      "free": {
+        "count": 2,
+        "args": ["gripper_pool"],
+        "probability": 0.8
+      }
+    },
+    "angle_joint_init": {
+      "angle_joint": {
+        "count": 3,
+        "args": ["angle_pool", "joint_pool_initial"]
+      }
+    },
+    "angle_joint_goal": {
+      "angle_joint": {
+        "count": 3,
+        "args": ["angle_pool", "joint_pool_goal"]
+      }
+    }  
+  },
+  "constant_initial_state": "(link-before link0 link1) (link-before link1 link2) (link-before link2 link3) (affected joint0 link1 joint1) (affected joint1 link1 joint0) (affected joint2 link1 joint0) (affected joint1 link2 joint2) (affected joint0 link2 joint2) (affected joint2 link2 joint1) (angle-before angle0 angle15) (angle-before angle15 angle30) (angle-before angle30 angle45) (angle-before angle45 angle60) (angle-before angle60 angle75) (angle-before angle75 angle90) (angle-before angle90 angle105) (angle-before angle105 angle120) (angle-before angle120 angle135) (angle-before angle135 angle150) (angle-before angle150 angle165) (angle-before angle165 angle180) (angle-before angle180 angle195) (angle-before angle195 angle210) (angle-before angle210 angle225) (angle-before angle225 angle240) (angle-before angle240 angle255) (angle-before angle255 angle270) (angle-before angle270 angle285) (angle-before angle285 angle300) (angle-before angle300 angle315) (angle-before angle315 angle330) (angle-before angle330 angle345) (angle-before angle345 angle0) (connected joint0 link0) (connected joint0 link1) (connected joint1 link1) (connected joint1 link2) (connected joint2 link2) (connected joint2 link3)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [["grasped", "not-grasped"]],
+      "mutex_prob": [[0.7, 0.3]],
+      "pools": ["angle_joint_init"] 
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["angle_joint_goal"] 
+    }
+  }
+}
