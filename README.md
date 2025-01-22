@@ -1,189 +1,140 @@
-# Master-Thesis
-Here will be present the work done for my Master Thesis
+# _Gideon_: PDDL Problem Generator and Planner Framework
+A Python-based framework for <b>generating Planning Domain Definition Language (PDDL) problem files</b> and <b>planning solutions</b> using various planners. This tool automates the creation of randomized PDDL problem instances, generates plans, and organizes datasets for AI planning research and development.
 
-## PDDL problem generator:
+## Overview
+_<b>Gideon</b>_ is designed to:
+- <b>Generate PDDL problem files</b> based on a given domain and a JSON configuration.
+- <b>Plan solutions</b> for the generated problems using supported planners (e.g., Probe).
+- <b>Organize datasets</b> for training, validation, and testing in AI planning systems.
+- <b>Track progress</b> and <b>ensure uniqueness</b> of generated problems and plans.
 
-### 1. Purpose
+This framework is ideal for researchers, developers, and educators working with AI planning systems, PDDL-based tools, and dataset generation.
 
-This script automatically generates random PDDL problem files from a given PDDL domain file.<br>
-It's particularly useful for testing planning algorithms and generating diverse problem instances.
+## Key Features
 
-### 2. Main Components
+### PDDL Problem Generation
+- <b>Customizable Problem Generation</b>: Define problem structures using a JSON configuration file.
+- <b>Randomized Initial and Goal States</b>: Generate problems with randomized initial and goal states based on user-defined probabilities.
+- <b>Duplicate Detection</b>: Use SHA-256 hashes to ensure unique problem instances.
+- <b>Progress Tracking</b>: Resume interrupted generation sessions with progress tracking.
+- <b>Logging and Reporting</b>: Automatically generate log files with statistics about the generation process.
+- <b>Folder Structure Management</b>: Organize generated problems, logs, and progress files into a structured directory.
 
-#### A. Command Line Interface
+### Planning
+- <b>Planner Integration</b>: Supports planners like Probe for generating plans.
+- <b>Plan Validation</b>: Validate generated plans using the VAL validation tool.
+- <b>Progress Tracking</b>: Track planning progress and resume interrupted sessions.
+- <b>Logging and Statistics</b>: Generate logs with planning statistics, including execution times and failure rates.
 
-```python
-parser.add_argument('-g', '--generator_path', type=str)
-parser.add_argument('-d', '--domain_origin', type=str)
-parser.add_argument('-o', '--output_dir', type=str)
-parser.add_argument('-n', '--num_problems', type=int)
-```
-- Takes inputs for generator path, domain file, output directory, and number of problems to generate
+### Dataset Handling
+- <b>Dataset Creation</b>: Process PDDL domains, problems, and plans into structured datasets.
+- <b>Dataset Splitting</b>: Split datasets into training, validation, and test sets.
+- <b>Stopping Sequences</b>: Optionally append stopping sequences to plan files for specific use cases.
+- <b>Logging and Reporting</b>: Generate logs summarizing dataset creation and splitting.
 
-#### B. Process Control
-
-- Implements three control functions:
-  - `paused_p()`: Pauses generation (triggered by 'p' key)
-  - `resume_p()`: Resumes generation (triggered by 'r' key)
-  - `stop_p()`: Stops generation (triggered by 's' key)
-
-#### C. File Structure Management
-
-```python
-output_dir/
-├── domain_name/
-│   ├── domain.pddl (copied)
-│   ├── problems/
-│   └── logs/
-```
-- Creates organized directory structure
-- Copies domain file
-- Creates separate directories for problems and logs
-
-#### D. Progress Tracking
-
-- Saves generation progress to allow resumption if interrupted
-- Maintains hash list to prevent duplicate problems
-- Generates log files with statistics
-
-### 3. Problem Generation Process
-
-#### A. Domain Loading
-
-1. Reads PDDL domain file
-2. Validates domain (checks for unsupported features like numeric fluents)
-3. Parses domain structure (types, predicates, etc.)
-
-#### B. Object Generation
-
-```python
-def generate_random_objects(prob_types, set_predicates):
-```
-- Creates random objects based on domain types
-- Handles both single and multiple type domains
-- Ensures sufficient objects for multi-term predicates
-
-#### C. State Generation
-
-1. Initial State (`generate_random_init_state`):
-   - Creates random ground predicates
-   - Assigns random truth values
-   - Handles predicates with different arities
-2. Goal State (`generate_random_goal_state`):
-   - Similar to initial state but uses subset of predicates
-   - Makes goals potentially achievable
-
-#### D. Problem Construction
-
-```python
-problem = Problem(
-    name=problem_name,
-    domain=domain,
-    domain_name=domain.name,
-    requirements=domain.requirements,
-    objects=prob_objects,
-    init=init_state,
-    goal=And(*goal_state)
-)
-```
-- Combines all components into PDDL problem instance
-- Uses logical AND for goal conditions
-
-### 4. Features
-
-#### A. Duplicate Detection
-
-- Generates SHA-256 hash for each problem
-- Maintains list of existing hashes
-- Prevents duplicate problem generation
-
-#### B. Progress Monitoring
-
-- Displays progress bar using tqdm
-- Shows generation status and time elapsed
-- Allows pause/resume/stop operations
-
-#### C. Error Handling
-
-- Validates input files and directories
-- Handles interruptions gracefully
-- Preserves progress on interruption
-
-### 5. How to install
-
-#### On Windows:
-
-1) Install [Python](https://www.python.org/downloads/) -> Tick "Add python.exe to PATH" and Select "Install Now"
-2) Install these packages (if you don't have pip installed, just install it before proceeding):
-
-```bash
-pip3 install pddl, tqdm, pynput
-```
-
-3) Download this repository in your Workspace, or with git:
-
+## Installation
+To use the framework, clone the repository and install the required libraries:
 ```bash
 git clone https://github.com/NichAttGH/Master-Thesis.git
+pip install (libraries)
 ```
+- numpy
+- tqdm
+- pickle
+- shutil
+- pddl
+- re
+- tabulate
 
-#### On Ubuntu (used Ubuntu 20.04 for testing):
-
-1) Install last version of Python
-2) Install these packages (if you don't have pip installed, just install it before proceeding):
-
+## Quick Start
+### 1. Generate PDDL Problems
+1. Prepare your domain file (e.g., domain.pddl) and JSON configuration file (e.g., config.json).
+2. Run the problem generator:
 ```bash
-pip3 install pddl, tqdm, pynput
+python gpg.py -d domain.pddl -o output_dir -n 10 -j config.json
 ```
+  - `-d`: Path to the PDDL domain file.
+  - `-o`: Output directory where you want to generate files.
+  - `-n`: Number of problems to generate.
+  - `-j`: Path to the JSON configuration file.
+3. Generated problems will be saved in the `output_dir/domain_name_folder/problems` directory.
 
-3) Download this repository in your Workspace, or with git:
-
+### 2. Generate Plans
+1. Use the generated problems to create plans:
 ```bash
-git clone https://github.com/NichAttGH/Master-Thesis.git
+python bp.py -o output_dir -c probe
 ```
+  - `-o`: Output directory containing the generated problems.
+  - `-c`: Planner to use (e.g., `probe`).
+2. Generated plans will be saved in the `domain_name_folder/plans` directory.
 
-### 6. Usage and Example
-
-- On Windows:
-
-To see how many args are available, just use the command below:
-
+### 3. Create Datasets
+1. Process the generated problems and plans into datasets:
 ```bash
-python <path/to/gpg.py> -h
+python gd.py -s output_dir -v 20 -t 10
 ```
+  - `-s`: Path to the directory containing the domain, problems, and plans.
+  - `-v`: Number of validation set entries.
+  - `-t`: Number of test set entries.
+2. Datasets will be saved in the `domain_name_folder/dataset` directory.
 
-Example of usage:
+## Documentation
+For detailed documentation on how to configure the JSON file, customize problem generation, use planners, and create datasets, refer to the [Documentation](https://github.com/NichAttGH/Master-Thesis).
 
-```bash
-python <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -j <path/to/json_file> -n 10
+## License
+This project is licensed under the GNU License. See the [LICENSE](https://github.com/NichAttGH/Master-Thesis/blob/main/LICENSE) file for details.
+
+## Support
+If you encounter any issues or have questions, please open an issue on GitHub or contact us at nicholasattolino@gmail.com.
+
+## Acknowledgments
+- Special thanks to the developers of the [pddl](https://github.com/AI-Planning/pddl/tree/main) Python library for providing the core functionality for PDDL parsing and manipulation.
+- This project was inspired by the need for efficient and scalable PDDL problem generation and planning in AI research.
+
+## Example JSON Configuration
+Here’s an example of a JSON configuration file for generating PDDL problems:
+```json
+{
+  "problem_prefix": "joint_bar",
+  "domain_name": "joint_bar",
+  "objects_pools": {
+    "gripper_pool": {
+      "object_type": "gripper",
+      "mutex": true,
+      "sequential": true,
+      "count": 2,
+      "name_prefix": "g"
+    },
+    "link_pool": {
+      "object_type": "link",
+      "sequential": true,
+      "count": 4,
+      "name_prefix": "link"
+    }
+  },
+  "predicates_pools": {
+    "grasped": {
+      "in-centre": {
+        "count": 1,
+        "args": ["center_joint$0"]
+      }
+    }
+  },
+  "constant_initial_state": "(link-before link0 link1)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [["grasped", "not-grasped"]],
+      "mutex_prob": [[0.7, 0.3]],
+      "pools": ["angle_joint_init"]
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["angle_joint_goal"]
+    }
+  }
+}
 ```
-
-- On Ubuntu (used Ubuntu 22.04 for testing):
-
-To see how many args are available, just use the command below:
-
-```bash
-sudo python3 <path/to/gpg.py> -h
-```
-
-Example of usage:
-
-```bash
-python3 <path/to/gpg.py> -d <path/to/domain.pddl> -o <path/to/output_directory> -j <path/to/json_file> -n 10
-```
-
-#### For both OS
-
-This example would:
-1. Load domain.pddl
-2. Create output directory structure
-3. Generate 10 unique problems
-4. Save problems and logs
-5. Allow interactive control during generation
-
-**NOTICE**: to generate only 1 PDDL problem file, use along with the rest of the command also:
-
-```bash
--g <path/to/gpg.py>
-```
-
-The script is particularly useful for automated testing and benchmarking of PDDL planners, providing a way to generate several problem instances while maintaining control over the generation process.
