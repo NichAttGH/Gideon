@@ -46,6 +46,14 @@ pip install (libraries)
 - re
 - tabulate
 
+Check the permissions on Probe and Validate because if they are not executable after downloading, you need to assign executability (Please note: the following commands work when you are inside their respective folders):
+```bash
+chmod +x probe
+```
+```bash
+chmod +x Validate
+```
+
 ## Quick Start
 ### 1. Generate PDDL Problems
 1. Prepare your domain file (e.g., domain.pddl) and JSON configuration file (e.g., config.json).
