@@ -1,4 +1,4 @@
-# _Gideon_: PDDL Problem Generator and Planner Framework
+# _Gideon: PDDL Problem Generator and Planner Framework_
 A Python-based framework for <b>generating Planning Domain Definition Language (PDDL) problem files</b> and <b>planning solutions</b> using various planners. This tool automates the creation of randomized PDDL problem instances, generates plans, and organizes datasets for AI planning research and development.
 
 ## Overview
@@ -87,62 +87,19 @@ python gd.py -s output_dir -v 20 -t 10
 2. Datasets will be saved in the `domain_name_folder/dataset` directory.
 
 ## Documentation
-For detailed documentation on how to configure the JSON file, customize problem generation, use planners, and create datasets, refer to the [Documentation](https://github.com/NichAttGH/Master-Thesis).
+For detailed documentation on:
+- how to configure the JSON file -> See the template [here](https://github.com/NichAttGH/Gideon/blob/main/Gideon/jsons/pddl_problem_generator_schema.json);
+- customize problem generation, use planners, and create datasets -> Read the comments inside the code.
 
 ## License
 This project is licensed under the GNU License. See the [LICENSE](https://github.com/NichAttGH/Master-Thesis/blob/main/LICENSE) file for details.
 
 ## Support
-If you encounter any issues or have questions, please open an issue on GitHub or contact us at nicholasattolino@gmail.com.
+If you encounter any issues or have questions, please open an issue on GitHub or contact me at nicholasattolino@gmail.com.
 
 ## Acknowledgments
 - Special thanks to the developers of the [pddl](https://github.com/AI-Planning/pddl/tree/main) Python library for providing the core functionality for PDDL parsing and manipulation.
 - This project was inspired by the need for efficient and scalable PDDL problem generation and planning in AI research.
 
 ## Example JSON Configuration
-Here’s an example of a JSON configuration file for generating PDDL problems:
-```json
-{
-  "problem_prefix": "joint_bar",
-  "domain_name": "joint_bar",
-  "objects_pools": {
-    "gripper_pool": {
-      "object_type": "gripper",
-      "mutex": true,
-      "sequential": true,
-      "count": 2,
-      "name_prefix": "g"
-    },
-    "link_pool": {
-      "object_type": "link",
-      "sequential": true,
-      "count": 4,
-      "name_prefix": "link"
-    }
-  },
-  "predicates_pools": {
-    "grasped": {
-      "in-centre": {
-        "count": 1,
-        "args": ["center_joint$0"]
-      }
-    }
-  },
-  "constant_initial_state": "(link-before link0 link1)",
-  "init_state": {
-    "predicates": {
-      "mutex_pools": [["grasped", "not-grasped"]],
-      "mutex_prob": [[0.7, 0.3]],
-      "pools": ["angle_joint_init"]
-    }
-  },
-  "constant_goal_state": "",
-  "goal_state": {
-    "predicates": {
-      "mutex_pools": [],
-      "mutex_prob": [],
-      "pools": ["angle_joint_goal"]
-    }
-  }
-}
-```
+Click [here](https://github.com/NichAttGH/Gideon/blob/main/Gideon/jsons/joint_bar_example.json) to see an example of a JSON configuration file for generating PDDL problems.
