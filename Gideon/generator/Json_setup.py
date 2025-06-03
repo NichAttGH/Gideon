@@ -22,25 +22,28 @@ class ObjectPool:
     - mutex (bool): Indicates if the pool is mutex.
     - sequential (bool): Indicates if the pool is sequential.
     - count (Union[int, List[int]]): The number of objects to create or a range of counts.
+    - unique (int): Number of unique objects in the pool.
     - name_prefix (str): The prefix for naming created objects.
     - name_pattern (List[int]): A pattern for naming objects.
     - created_objects (List[Constant]): The list of created objects.
     """
     def __init__(self, object_type: str, count: Union[int, List[int]], name_prefix: str, mutex: bool = False,
-                 sequential: bool = False, name_pattern: List[int] = None, created_objects: List[Constant] = []):
+                 sequential: bool = False, unique: int = None, name_pattern: List[int] = None, is_grid: bool = False, created_objects: List[Constant] = []):
         self.object_type = object_type
         self.mutex = mutex
         self.sequential = sequential
         self.count = count
+        self.unique = unique
         self.name_prefix = name_prefix
         self.name_pattern = name_pattern
+        self.is_grid = is_grid
         self.created_objects = created_objects
 
     def __str__(self):
         """Returns a string representation of the ObjectPool."""
         return (f"ObjectPool(object_type = {self.object_type}, mutex = {self.mutex}, sequential = {self.sequential}, "
-                f"count = {self.count}, name_prefix = {self.name_prefix}, name_pattern = {self.name_pattern},\n"
-                f"created_objects = {self.created_objects})")
+                f"count = {self.count}, unique = {self.unique}, name_prefix = {self.name_prefix}, \n"
+                f" name_pattern = {self.name_pattern}, created_objects = {self.created_objects})")
     
     def __repr__(self):
         """Returns the string representation for the ObjectPool."""
@@ -250,104 +253,359 @@ class JsonSchema:
 
             # Determines the number of objects to be created
             count = pool.count
-            if isinstance(count, list):  # If count is a list, choose a random value
+            # Take bool flag from JSON if a grid pattern is needed
+            isgrid = pool.is_grid
+            # Get unique value if specified
+            unique = pool.unique
+
+            # Condition for grid pattern
+            if isinstance(count, list) and isgrid == True:
+                rows = count[0]
+                columns = count[1]
+                for i in range(rows):
+                    for j in range(columns):
+                        if pool.name_pattern:
+                            step = pool.name_pattern[1]
+                            name_pattern_value = j * step
+                            constant_name = f"{pool.name_prefix}{name_pattern_value}"
+                        else:
+                            constant_name = f"{pool.name_prefix}_{i}-{j}"
+                        constant = Constant(constant_name, pool.object_type)
+                        pool.created_objects.append(constant)
+
+            # Condition if count is a list with a minimum and maximum value to choose from
+            elif isinstance(count, list):
                 count = random.randint(count[0], count[1])
-            for i in range(count):
-                if pool.name_pattern:
-                    step = pool.name_pattern[1]
-                    name_pattern_value = i * step
-                    constant_name = f"{pool.name_prefix}{name_pattern_value}"
+                # Handle unique constraint
+                if unique is not None and unique < count:
+                    # Generate unique objects first
+                    unique_objects = []
+                    for i in range(unique):
+                        if pool.name_pattern:
+                            step = pool.name_pattern[1]
+                            name_pattern_value = i * step
+                            constant_name = f"{pool.name_prefix}{name_pattern_value}"
+                        else:
+                            constant_name = f"{pool.name_prefix}{i}"
+                        constant = Constant(constant_name, pool.object_type)
+                        unique_objects.append(constant)
+                    
+                    # Distribute copies as evenly as possible
+                    base_copies = count // unique
+                    extra_copies = count % unique
+                    
+                    for i, obj in enumerate(unique_objects):
+                        # Add base number of copies
+                        copies_to_add = base_copies
+                        # Add one extra copy for the first 'extra_copies' objects
+                        if i < extra_copies:
+                            copies_to_add += 1
+                        
+                        for _ in range(copies_to_add):
+                            pool.created_objects.append(obj)
                 else:
-                    constant_name = f"{pool.name_prefix}{i}"
-                constant = Constant(constant_name, pool.object_type)
-                pool.created_objects.append(constant)
+                    # Normal generation without unique constraint
+                    for i in range(count):
+                        if pool.name_pattern:
+                            step = pool.name_pattern[1]
+                            name_pattern_value = i * step
+                            constant_name = f"{pool.name_prefix}{name_pattern_value}"
+                        else:
+                            constant_name = f"{pool.name_prefix}{i}"
+                        constant = Constant(constant_name, pool.object_type)
+                        pool.created_objects.append(constant)
+            
+            # Condition if count is a simple int value
+            elif isinstance(count, int):
+                # Handle unique constraint
+                if unique is not None and unique < count:
+                    # Generate unique objects first
+                    unique_objects = []
+                    for i in range(unique):
+                        if pool.name_pattern:
+                            step = pool.name_pattern[1]
+                            name_pattern_value = i * step
+                            constant_name = f"{pool.name_prefix}{name_pattern_value}"
+                        else:
+                            constant_name = f"{pool.name_prefix}{i}"
+                        constant = Constant(constant_name, pool.object_type)
+                        unique_objects.append(constant)
+                    
+                    # Distribute copies as evenly as possible
+                    base_copies = count // unique
+                    extra_copies = count % unique
+                    
+                    for i, obj in enumerate(unique_objects):
+                        # Add base number of copies
+                        copies_to_add = base_copies
+                        # Add one extra copy for the first 'extra_copies' objects
+                        if i < extra_copies:
+                            copies_to_add += 1
+                        
+                        for _ in range(copies_to_add):
+                            pool.created_objects.append(obj)
+                else:
+                    # Normal generation without unique constraint
+                    for i in range(count):
+                        if pool.name_pattern:
+                            step = pool.name_pattern[1]
+                            name_pattern_value = i * step
+                            constant_name = f"{pool.name_prefix}{name_pattern_value}"
+                        else:
+                            constant_name = f"{pool.name_prefix}{i}"
+                        constant = Constant(constant_name, pool.object_type)
+                        pool.created_objects.append(constant)
+
         return pool.created_objects
         
     def gen_dict_ordered(self):
         """
-        Generates a dictionary of predicates ordered by their keys.
+        Generates a dictionary of predicates ordered by their keys with proper object assignment.
 
         This method iterates through the predicate pools and constructs a dictionary
-        that organizes predicates by their associated pools and structures.
+        that organizes predicates by their associated pools and structures. It handles
+        complex object selection scenarios including:
+
+        - Synchronized object selection across predicates using the '$' notation
+        - Sequential object selection (objects are picked in order)
+        - Mutex object selection (each object used at most once per context)
+        - Unique object constraints (when pools contain duplicates)
+        - Step modifiers for synchronized selections (e.g., $0+1, $0-1)
+
+        The function operates in two main phases:
+        1. First Pass: Collects all synchronization tags and pre-generates object selections
+        for synchronized arguments to ensure consistency across different predicates.
+        2. Second Pass: Generates the actual predicates using either the pre-generated
+        synchronized selections or handling non-synchronized arguments according to
+        their pool's configuration (sequential/mutex/random).
+
+        Special handling for pools with 'unique' constraint:
+        When a pool has fewer unique objects than total objects (e.g., 6 objects but
+        only 2 unique), the selection logic operates on the unique objects only,
+        preventing issues with duplicate selections.
 
         Returns:
-            dict_ordered_by_key (dict): A dictionary ordered by keys containing predicates and their arguments.
+            dict: A nested dictionary structure where:
+                - First level keys are predicate pool names
+                - Second level keys are predicate names
+                - Values are lists of argument lists, where each argument list
+                contains the Constant objects for that predicate instance
+                
+        Example structure:
+            {
+                'pool1': {
+                    'predicate1': [[obj1, obj2], [obj3, obj4]],
+                    'predicate2': [[obj5], [obj6]]
+                },
+                'pool2': {
+                    'predicate3': [[obj7, obj8, obj9]]
+                }
+            }
         """
         dict_ordered_by_key = dict()  # Initialize an empty dictionary
 
+        # Global synchronization dictionary: tag -> (pool_name -> list of selected objects)
+        # This ensures all predicates using the same tag share the same selected objects
+        # MOVED OUTSIDE THE MAIN LOOP to ensure synchronization across all predicate pools
+        global_sync_selections = {}
+        
+        # Dictionary for tracking next available index per pool (for sequential)
+        next_index_per_pool = {}
+        # Dictionary for tracking used indices per pool (for mutex)
+        used_indices_per_pool = {}
+
+        # FIRST PASS: Collect all sync tags and their requirements across ALL predicate pools
+        tag_max_counts = {}
+        tag_pools = {}  # Map tag -> pool_name (to know which pool each tag refers to)
+        
+        for key, pool in self.predicate_pools.items():
+            for predicate_name, pred_structure in pool.predicates.items():
+                for arg in pred_structure.args:
+                    if "$" in arg:
+                        base_name, expression = arg.split("$", 1)
+                        
+                        # Extract just the tag (ignore +/- steps for now)
+                        tag = expression
+                        if "+" in expression:
+                            tag = expression.split("+")[0]
+                        elif "-" in expression:
+                            tag = expression.split("-")[0]
+                        
+                        # Create a unique key combining pool name and tag
+                        unique_tag = f"{base_name}${tag}"
+                        
+                        # Track the maximum count needed for this tag and which pool it refers to
+                        if unique_tag not in tag_max_counts:
+                            tag_max_counts[unique_tag] = 0
+                            tag_pools[unique_tag] = base_name
+                        tag_max_counts[unique_tag] = max(tag_max_counts[unique_tag], pred_structure.count)
+
+        # Pre-generate selections for each synchronization tag
+        for unique_tag, max_count in tag_max_counts.items():
+            pool_name = tag_pools[unique_tag]
+            if pool_name in self.objects_pools:
+                pool_obj = self.objects_pools[pool_name]
+                effective_pool = get_effective_pool(pool_obj)
+                
+                # Initialize tracking structures
+                track_key = f"{unique_tag}_track"
+                if track_key not in used_indices_per_pool:
+                    used_indices_per_pool[track_key] = []
+                if track_key not in next_index_per_pool:
+                    next_index_per_pool[track_key] = 0
+                
+                # Generate the sequence of objects for this tag
+                selected_objects = []
+                for i in range(max_count):
+                    available_indices = list(range(len(effective_pool)))
+                    
+                    if pool_obj.sequential:
+                        # Sequential: use next available index
+                        if i == 0:
+                            # First selection: random start point
+                            selected_index = random.choice(available_indices)
+                            next_index_per_pool[track_key] = selected_index
+                        else:
+                            # Subsequent selections: sequential from the last selected
+                            selected_index = (next_index_per_pool[track_key] + 1) % len(effective_pool)
+                        next_index_per_pool[track_key] = selected_index
+                    else:
+                        # Random selection
+                        if pool_obj.mutex:
+                            # Mutex: avoid already used objects if possible
+                            available_indices = [idx for idx in available_indices if idx not in used_indices_per_pool[track_key]]
+                            if not available_indices:
+                                # All objects used, reset (ring behavior)
+                                used_indices_per_pool[track_key] = []
+                                available_indices = list(range(len(effective_pool)))
+                        
+                        selected_index = random.choice(available_indices)
+                    
+                    selected_objects.append(effective_pool[selected_index])
+                    
+                    # Track usage if mutex
+                    if pool_obj.mutex:
+                        used_indices_per_pool[track_key].append(selected_index)
+                
+                # Store the pre-generated selections for this unique tag
+                global_sync_selections[unique_tag] = selected_objects
+
+        # SECOND PASS: Generate predicates using the pre-generated synchronized selections
         for key, pool in self.predicate_pools.items():
             # Initialize a dictionary to store the predicates associated with this pool
             if key not in dict_ordered_by_key:
                 dict_ordered_by_key[key] = {}
 
-            for pred_name, pred_structure in pool.predicates.items():
-                # Dictionary for storing already selected objects
-                selected_objects = {}
-                # Dictionary for tracking indexes used, separated by pool
-                used_indices_per_pool = {}
+            for predicate_name, pred_structure in pool.predicates.items():
+                # Initialize the key in the pool dictionary if necessary
+                if predicate_name not in dict_ordered_by_key[key]:
+                    dict_ordered_by_key[key][predicate_name] = []
 
-                for i in range(pred_structure.count):
-
+                # For non-synchronized predicates, we need to handle sequential/mutex at the predicate level
+                # Initialize tracking for this specific predicate
+                predicate_track_key = f"{key}_{predicate_name}"
+                
+                for predicate_instance in range(pred_structure.count):
                     # Evaluate the probability to include the predicate.
-                    if random.random() > pred_structure.probability:  # Skip the predicate based on probability
+                    if random.random() > pred_structure.probability:
                         continue
 
                     pred_args = []  # List of terms of the current predicate
 
-                    for arg in pred_structure.args:
-                        if "$" in arg:
-                            # syntax: base_name$<base>[+|–<offset>], e.g. "location_pool$0+1"
-                            base_name, expr = arg.split("$", 1)
-                            pool = self.objects_pools[base_name]
-                            # init tracking structures
-                            used = used_indices_per_pool.setdefault(base_name, set())
-                            last = selected_objects.get(base_name, None)
+                    for arg_index, arg in enumerate(pred_structure.args):
+                        obj = None
+                        
+                        if "$" in arg:  # Synchronized argument
+                            base_name, expression = arg.split("$", 1)
+                            
+                            # Parse the expression to extract tag and step
+                            tag = expression
+                            step = 0
+                            
+                            if "+" in expression:
+                                tag, step_str = expression.split("+", 1)
+                                step = int(step_str)
+                            elif "-" in expression:
+                                tag, step_str = expression.split("-", 1)
+                                step = -int(step_str)
 
-                            # parse expression
-                            if "+" in expr:
-                                base_str, offset_str = expr.split("+", 1)
-                                offset = int(offset_str)
-                            elif "-" in expr:
-                                base_str, offset_str = expr.split("-", 1)
-                                offset = -int(offset_str)
-                            else:
-                                base_str, offset = expr, 0
+                            # Create unique tag key
+                            unique_tag = f"{base_name}${tag}"
 
-                            base_idx = last if last is not None else int(base_str)
-                            new_idx = (base_idx + offset) % len(pool.created_objects)
-
-                            # record usage
-                            used.add(new_idx)
-                            selected_objects[base_name] = new_idx
-
-                            obj = pool.created_objects[new_idx]
+                            # Get the synchronized object for this tag and instance
+                            if (unique_tag in global_sync_selections and 
+                                predicate_instance < len(global_sync_selections[unique_tag])):
+                                
+                                # Get the object from pre-generated selections
+                                base_obj = global_sync_selections[unique_tag][predicate_instance]
+                                
+                                # Apply step if specified
+                                if step != 0:
+                                    pool_obj = self.objects_pools[base_name]
+                                    effective_pool = get_effective_pool(pool_obj)
+                                    
+                                    # Find the index of the base object in effective pool
+                                    base_obj_index = -1
+                                    for idx, obj_in_pool in enumerate(effective_pool):
+                                        if obj_in_pool.name == base_obj.name:
+                                            base_obj_index = idx
+                                            break
+                                    
+                                    if base_obj_index != -1:
+                                        actual_index = (base_obj_index + step) % len(effective_pool)
+                                        obj = effective_pool[actual_index]
+                                    else:
+                                        obj = base_obj
+                                else:
+                                    obj = base_obj
 
                         else:
-                            # your existing plain-pool selection, e.g. sequential vs. random-unique
+                            # Non-synchronized argument - handle normally
                             base_name = arg
-                            pool = self.objects_pools[base_name]
-                            used = used_indices_per_pool.setdefault(base_name, set())
+                            if base_name in self.objects_pools:
+                                pool_obj = self.objects_pools[base_name]
+                                effective_pool = get_effective_pool(pool_obj)
+                                
+                                # Create a unique tracking key for this predicate and argument
+                                arg_track_key = f"{predicate_track_key}_{base_name}_{arg_index}"
+                                
+                                # Initialize tracking structures if needed
+                                if arg_track_key not in used_indices_per_pool:
+                                    used_indices_per_pool[arg_track_key] = []
+                                if arg_track_key not in next_index_per_pool:
+                                    next_index_per_pool[arg_track_key] = None
 
-                            if pool.sequential:
-                                idx = len(used) % len(pool.created_objects)
-                            else:
-                                available = set(range(len(pool.created_objects))) - used
-                                if not available:
-                                    raise RuntimeError(f"No more unused objects in pool '{base_name}'")
-                                idx = random.choice(list(available))
+                                available_indices = list(range(len(effective_pool)))
 
-                            used.add(idx)
-                            selected_objects[base_name] = idx
-                            obj = pool.created_objects[idx]
+                                if pool_obj.sequential:
+                                    # For sequential, maintain state across predicate instances
+                                    if next_index_per_pool[arg_track_key] is None:
+                                        # First time: random start
+                                        current_index = random.choice(available_indices)
+                                        next_index_per_pool[arg_track_key] = current_index
+                                    else:
+                                        # Continue from last position
+                                        current_index = (next_index_per_pool[arg_track_key] + 1) % len(effective_pool)
+                                        next_index_per_pool[arg_track_key] = current_index
+                                else:
+                                    if pool_obj.mutex:
+                                        available_indices = [i for i in available_indices if i not in used_indices_per_pool[arg_track_key]]
+                                        if not available_indices:
+                                            used_indices_per_pool[arg_track_key] = []
+                                            available_indices = list(range(len(effective_pool)))
+                                    
+                                    current_index = random.choice(available_indices)
+                                    
+                                    if pool_obj.mutex:
+                                        used_indices_per_pool[arg_track_key].append(current_index)
 
-                        pred_args.append(obj)
+                                obj = effective_pool[current_index]
                         
-                    # Initialize the key in the pool dictionary if necessary
-                    if pred_structure.name not in dict_ordered_by_key[key]:
-                        dict_ordered_by_key[key][pred_structure.name] = []
+                        if obj:
+                            pred_args.append(obj)
 
-                    # Add the created predicate
-                    dict_ordered_by_key[key][pred_structure.name].append(pred_args)
+                    if pred_args:
+                        dict_ordered_by_key[key][predicate_name].append(pred_args)
 
         return dict_ordered_by_key
 
@@ -397,3 +655,30 @@ def load_json(filepath: str):
         metric=data["metric"]
     )
     return json_schema
+
+# Helper function to get effective pool (unique objects if unique is set)
+def get_effective_pool(pool_obj):
+    """
+    Returns the effective pool of objects, considering the unique constraint.
+    
+    If a pool has a 'unique' attribute set and it's less than the total count,
+    this function returns only the unique objects (no duplicates).
+    Otherwise, it returns the full pool of created objects.
+    
+    Args:
+        pool_obj: An ObjectPool instance
+        
+    Returns:
+        list: A list of Constant objects (either unique or all objects)
+    """
+    if pool_obj.unique is not None and pool_obj.unique < len(pool_obj.created_objects):
+        # Create a list of unique objects
+        unique_objects = []
+        seen_names = set()
+        for obj in pool_obj.created_objects:
+            if obj.name not in seen_names:
+                unique_objects.append(obj)
+                seen_names.add(obj.name)
+        return unique_objects
+    else:
+        return pool_obj.created_objects
