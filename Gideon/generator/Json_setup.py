@@ -55,15 +55,39 @@ class PredicateStructure:
 
     Attributes:
     - name (str): The name of the predicate.
-    - count (int): The number of instances of the predicate.
+    - count (Union[int, List[int]]): The number of instances of the predicate, or a range [min, max].
     - args (list): The arguments of the predicate.
     - probability (float): The probability of the predicate being selected (default 1.0).
     """
-    def __init__(self, name: str, count: int, args: list, probability: float = 1.0):
+    def __init__(self, name: str, count: Union[int, List[int]], args: list, probability: float = 1.0):
         self.name = name
         self.count = count
         self.args = args
         self.probability = probability  # Default to 1.0 if not provided
+    
+    def get_actual_count(self):
+        """
+        Returns the actual count, resolving random range if needed.
+        
+        Returns:
+            int: The resolved count value.
+        """
+        if isinstance(self.count, list):
+            return random.randint(self.count[0], self.count[1])
+        else:
+            return self.count
+    
+    def get_max_possible_count(self):
+        """
+        Returns the maximum possible count (for pre-planning purposes).
+        
+        Returns:
+            int: The maximum count that could be generated.
+        """
+        if isinstance(self.count, list):
+            return self.count[1]  # Return max value
+        else:
+            return self.count
 
     def __str__(self):
         """Returns a string representation of the PredicateStructure."""
@@ -361,62 +385,18 @@ class JsonSchema:
     def gen_dict_ordered(self):
         """
         Generates a dictionary of predicates ordered by their keys with proper object assignment.
-
-        This method iterates through the predicate pools and constructs a dictionary
-        that organizes predicates by their associated pools and structures. It handles
-        complex object selection scenarios including:
-
-        - Synchronized object selection across predicates using the '$' notation
-        - Sequential object selection (objects are picked in order)
-        - Mutex object selection (each object used at most once per context)
-        - Unique object constraints (when pools contain duplicates)
-        - Step modifiers for synchronized selections (e.g., $0+1, $0-1)
-
-        The function operates in two main phases:
-        1. First Pass: Collects all synchronization tags and pre-generates object selections
-        for synchronized arguments to ensure consistency across different predicates.
-        2. Second Pass: Generates the actual predicates using either the pre-generated
-        synchronized selections or handling non-synchronized arguments according to
-        their pool's configuration (sequential/mutex/random).
-
-        Special handling for pools with 'unique' constraint:
-        When a pool has fewer unique objects than total objects (e.g., 6 objects but
-        only 2 unique), the selection logic operates on the unique objects only,
-        preventing issues with duplicate selections.
-
-        Returns:
-            dict: A nested dictionary structure where:
-                - First level keys are predicate pool names
-                - Second level keys are predicate names
-                - Values are lists of argument lists, where each argument list
-                contains the Constant objects for that predicate instance
-                
-        Example structure:
-            {
-                'pool1': {
-                    'predicate1': [[obj1, obj2], [obj3, obj4]],
-                    'predicate2': [[obj5], [obj6]]
-                },
-                'pool2': {
-                    'predicate3': [[obj7, obj8, obj9]]
-                }
-            }
-        """
-        dict_ordered_by_key = dict()  # Initialize an empty dictionary
-
-        # Global synchronization dictionary: tag -> (pool_name -> list of selected objects)
-        # This ensures all predicates using the same tag share the same selected objects
-        # MOVED OUTSIDE THE MAIN LOOP to ensure synchronization across all predicate pools
-        global_sync_selections = {}
         
-        # Dictionary for tracking next available index per pool (for sequential)
+        Now supports variable predicate count: when count is [min, max], a random value 
+        in that range is selected for each predicate.
+        """
+        dict_ordered_by_key = dict()
+        global_sync_selections = {}
         next_index_per_pool = {}
-        # Dictionary for tracking used indices per pool (for mutex)
         used_indices_per_pool = {}
 
-        # FIRST PASS: Collect all sync tags and their requirements across ALL predicate pools
+        # FIRST PASS: Collect all sync tags (using MAX possible count for planning)
         tag_max_counts = {}
-        tag_pools = {}  # Map tag -> pool_name (to know which pool each tag refers to)
+        tag_pools = {}
         
         for key, pool in self.predicate_pools.items():
             for predicate_name, pred_structure in pool.predicates.items():
@@ -424,58 +404,50 @@ class JsonSchema:
                     if "$" in arg:
                         base_name, expression = arg.split("$", 1)
                         
-                        # Extract just the tag (ignore +/- steps for now)
                         tag = expression
                         if "+" in expression:
                             tag = expression.split("+")[0]
                         elif "-" in expression:
                             tag = expression.split("-")[0]
                         
-                        # Create a unique key combining pool name and tag
                         unique_tag = f"{base_name}${tag}"
                         
-                        # Track the maximum count needed for this tag and which pool it refers to
                         if unique_tag not in tag_max_counts:
                             tag_max_counts[unique_tag] = 0
                             tag_pools[unique_tag] = base_name
-                        tag_max_counts[unique_tag] = max(tag_max_counts[unique_tag], pred_structure.count)
+                        
+                        # MODIFICATO: Usa il massimo possibile per la pre-pianificazione
+                        max_count = pred_structure.get_max_possible_count()
+                        tag_max_counts[unique_tag] = max(tag_max_counts[unique_tag], max_count)
 
-        # Pre-generate selections for each synchronization tag
+        # Pre-generate selections for each synchronization tag (unchanged)
         for unique_tag, max_count in tag_max_counts.items():
             pool_name = tag_pools[unique_tag]
             if pool_name in self.objects_pools:
                 pool_obj = self.objects_pools[pool_name]
                 effective_pool = get_effective_pool(pool_obj)
                 
-                # Initialize tracking structures
                 track_key = f"{unique_tag}_track"
                 if track_key not in used_indices_per_pool:
                     used_indices_per_pool[track_key] = []
                 if track_key not in next_index_per_pool:
                     next_index_per_pool[track_key] = 0
                 
-                # Generate the sequence of objects for this tag
                 selected_objects = []
                 for i in range(max_count):
                     available_indices = list(range(len(effective_pool)))
                     
                     if pool_obj.sequential:
-                        # Sequential: use next available index
                         if i == 0:
-                            # First selection: random start point
                             selected_index = random.choice(available_indices)
                             next_index_per_pool[track_key] = selected_index
                         else:
-                            # Subsequent selections: sequential from the last selected
                             selected_index = (next_index_per_pool[track_key] + 1) % len(effective_pool)
                         next_index_per_pool[track_key] = selected_index
                     else:
-                        # Random selection
                         if pool_obj.mutex:
-                            # Mutex: avoid already used objects if possible
                             available_indices = [idx for idx in available_indices if idx not in used_indices_per_pool[track_key]]
                             if not available_indices:
-                                # All objects used, reset (ring behavior)
                                 used_indices_per_pool[track_key] = []
                                 available_indices = list(range(len(effective_pool)))
                         
@@ -483,34 +455,38 @@ class JsonSchema:
                     
                     selected_objects.append(effective_pool[selected_index])
                     
-                    # Track usage if mutex
                     if pool_obj.mutex:
                         used_indices_per_pool[track_key].append(selected_index)
                 
-                # Store the pre-generated selections for this unique tag
                 global_sync_selections[unique_tag] = selected_objects
 
-        # SECOND PASS: Generate predicates using the pre-generated synchronized selections
+        # SECOND PASS: Generate predicates with VARIABLE COUNT support
         for key, pool in self.predicate_pools.items():
-            # Initialize a dictionary to store the predicates associated with this pool
             if key not in dict_ordered_by_key:
                 dict_ordered_by_key[key] = {}
 
             for predicate_name, pred_structure in pool.predicates.items():
-                # Initialize the key in the pool dictionary if necessary
                 if predicate_name not in dict_ordered_by_key[key]:
                     dict_ordered_by_key[key][predicate_name] = []
 
-                # For non-synchronized predicates, we need to handle sequential/mutex at the predicate level
-                # Initialize tracking for this specific predicate
-                predicate_track_key = f"{key}_{predicate_name}"
+                # NUOVO: Risolvi il count effettivo per questo predicato
+                actual_count = pred_structure.get_actual_count()
                 
-                for predicate_instance in range(pred_structure.count):
-                    # Evaluate the probability to include the predicate.
-                    if random.random() > pred_structure.probability:
+                # Optional: Debug print per vedere il count risolto
+                #if isinstance(pred_structure.count, list):
+                #    print(f"Predicate {predicate_name}: count range {pred_structure.count} → resolved to {actual_count}")
+
+                # Extended mutex tracking
+                global_predicate_mutex_usage = {}
+
+                # MODIFICATO: Usa actual_count invece di pred_structure.count
+                for predicate_instance in range(actual_count):
+                    if pred_structure.probability < 1.0 and random.random() > pred_structure.probability:
                         continue
 
-                    pred_args = []  # List of terms of the current predicate
+                    pred_args = []
+                    predicate_mutex_usage = {}
+                    predicate_sequential_state = {}
 
                     for arg_index, arg in enumerate(pred_structure.args):
                         obj = None
@@ -518,7 +494,6 @@ class JsonSchema:
                         if "$" in arg:  # Synchronized argument
                             base_name, expression = arg.split("$", 1)
                             
-                            # Parse the expression to extract tag and step
                             tag = expression
                             step = 0
                             
@@ -529,22 +504,17 @@ class JsonSchema:
                                 tag, step_str = expression.split("-", 1)
                                 step = -int(step_str)
 
-                            # Create unique tag key
                             unique_tag = f"{base_name}${tag}"
 
-                            # Get the synchronized object for this tag and instance
                             if (unique_tag in global_sync_selections and 
                                 predicate_instance < len(global_sync_selections[unique_tag])):
                                 
-                                # Get the object from pre-generated selections
                                 base_obj = global_sync_selections[unique_tag][predicate_instance]
                                 
-                                # Apply step if specified
                                 if step != 0:
                                     pool_obj = self.objects_pools[base_name]
                                     effective_pool = get_effective_pool(pool_obj)
                                     
-                                    # Find the index of the base object in effective pool
                                     base_obj_index = -1
                                     for idx, obj_in_pool in enumerate(effective_pool):
                                         if obj_in_pool.name == base_obj.name:
@@ -560,44 +530,75 @@ class JsonSchema:
                                     obj = base_obj
 
                         else:
-                            # Non-synchronized argument - handle normally
+                            # Non-synchronized argument with extended mutex
                             base_name = arg
                             if base_name in self.objects_pools:
                                 pool_obj = self.objects_pools[base_name]
                                 effective_pool = get_effective_pool(pool_obj)
                                 
-                                # Create a unique tracking key for this predicate and argument
-                                arg_track_key = f"{predicate_track_key}_{base_name}_{arg_index}"
+                                if base_name not in predicate_mutex_usage:
+                                    predicate_mutex_usage[base_name] = []
+                                if base_name not in predicate_sequential_state:
+                                    predicate_sequential_state[base_name] = None
                                 
-                                # Initialize tracking structures if needed
-                                if arg_track_key not in used_indices_per_pool:
-                                    used_indices_per_pool[arg_track_key] = []
-                                if arg_track_key not in next_index_per_pool:
-                                    next_index_per_pool[arg_track_key] = None
+                                global_key = (base_name, arg_index)
+                                if global_key not in global_predicate_mutex_usage:
+                                    global_predicate_mutex_usage[global_key] = []
 
                                 available_indices = list(range(len(effective_pool)))
 
-                                if pool_obj.sequential:
-                                    # For sequential, maintain state across predicate instances
-                                    if next_index_per_pool[arg_track_key] is None:
-                                        # First time: random start
-                                        current_index = random.choice(available_indices)
-                                        next_index_per_pool[arg_track_key] = current_index
-                                    else:
-                                        # Continue from last position
-                                        current_index = (next_index_per_pool[arg_track_key] + 1) % len(effective_pool)
-                                        next_index_per_pool[arg_track_key] = current_index
-                                else:
-                                    if pool_obj.mutex:
-                                        available_indices = [i for i in available_indices if i not in used_indices_per_pool[arg_track_key]]
-                                        if not available_indices:
-                                            used_indices_per_pool[arg_track_key] = []
+                                if pool_obj.mutex:
+                                    # Apply global mutex (across instances)
+                                    available_indices = [i for i in available_indices 
+                                                    if i not in global_predicate_mutex_usage[global_key]]
+                                    
+                                    # Apply local mutex (within instance)
+                                    available_indices = [i for i in available_indices 
+                                                    if i not in predicate_mutex_usage[base_name]]
+                                    
+                                    if not available_indices:
+                                        if pool_obj.sequential:
+                                            raise ValueError(f"Pool {base_name}: no objects available "
+                                                        f"with extended mutex and sequential=True")
+                                        else:
+                                            predicate_mutex_usage[base_name] = []
                                             available_indices = list(range(len(effective_pool)))
-                                    
+                                            available_indices = [i for i in available_indices 
+                                                            if i not in global_predicate_mutex_usage[global_key]]
+                                            
+                                            if not available_indices:
+                                                raise ValueError(f"Pool {base_name}: no objects available "
+                                                            f"with global mutex. Pool too small.")
+
+                                # Object selection logic (unchanged)
+                                if pool_obj.sequential:
+                                    if predicate_sequential_state[base_name] is None:
+                                        current_index = random.choice(available_indices)
+                                        predicate_sequential_state[base_name] = current_index
+                                    else:
+                                        if pool_obj.mutex:
+                                            current = predicate_sequential_state[base_name]
+                                            next_candidates = []
+                                            for offset in range(1, len(effective_pool)):
+                                                candidate = (current + offset) % len(effective_pool)
+                                                if candidate in available_indices:
+                                                    next_candidates.append(candidate)
+                                            
+                                            if not next_candidates:
+                                                raise ValueError(f"Pool {base_name}: no sequential objects available")
+                                            
+                                            current_index = min(next_candidates)
+                                        else:
+                                            current_index = (predicate_sequential_state[base_name] + 1) % len(effective_pool)
+                                        
+                                        predicate_sequential_state[base_name] = current_index
+                                else:
                                     current_index = random.choice(available_indices)
-                                    
-                                    if pool_obj.mutex:
-                                        used_indices_per_pool[arg_track_key].append(current_index)
+                                
+                                # Update mutex tracking
+                                if pool_obj.mutex:
+                                    predicate_mutex_usage[base_name].append(current_index)
+                                    global_predicate_mutex_usage[global_key].append(current_index)
 
                                 obj = effective_pool[current_index]
                         
@@ -608,6 +609,33 @@ class JsonSchema:
                         dict_ordered_by_key[key][predicate_name].append(pred_args)
 
         return dict_ordered_by_key
+
+# Helper function to get effective pool (unique objects if unique is set)
+def get_effective_pool(pool_obj):
+    """
+    Returns the effective pool of objects, considering the unique constraint.
+    
+    If a pool has a 'unique' attribute set and it's less than the total count,
+    this function returns only the unique objects (no duplicates).
+    Otherwise, it returns the full pool of created objects.
+    
+    Args:
+        pool_obj: An ObjectPool instance
+        
+    Returns:
+        list: A list of Constant objects (either unique or all objects)
+    """
+    if pool_obj.unique is not None and pool_obj.unique < len(pool_obj.created_objects):
+        # Create a list of unique objects
+        unique_objects = []
+        seen_names = set()
+        for obj in pool_obj.created_objects:
+            if obj.name not in seen_names:
+                unique_objects.append(obj)
+                seen_names.add(obj.name)
+        return unique_objects
+    else:
+        return pool_obj.created_objects
 
 def load_json(filepath: str):
     """
@@ -655,30 +683,3 @@ def load_json(filepath: str):
         metric=data["metric"]
     )
     return json_schema
-
-# Helper function to get effective pool (unique objects if unique is set)
-def get_effective_pool(pool_obj):
-    """
-    Returns the effective pool of objects, considering the unique constraint.
-    
-    If a pool has a 'unique' attribute set and it's less than the total count,
-    this function returns only the unique objects (no duplicates).
-    Otherwise, it returns the full pool of created objects.
-    
-    Args:
-        pool_obj: An ObjectPool instance
-        
-    Returns:
-        list: A list of Constant objects (either unique or all objects)
-    """
-    if pool_obj.unique is not None and pool_obj.unique < len(pool_obj.created_objects):
-        # Create a list of unique objects
-        unique_objects = []
-        seen_names = set()
-        for obj in pool_obj.created_objects:
-            if obj.name not in seen_names:
-                unique_objects.append(obj)
-                seen_names.add(obj.name)
-        return unique_objects
-    else:
-        return pool_obj.created_objects
