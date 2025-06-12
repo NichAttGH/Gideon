@@ -1,0 +1,67 @@
+{
+  "problem_prefix": "blocksworld-4ops",
+  "domain_name": "blocksworld-4ops",
+  "objects_pools": {
+      "block_pool_init":{
+        "object_type": "block",
+        "count": 4,
+        "mutex": true,
+        "sequential": true,
+        "name_prefix": "b"
+        },
+        "block_pool_goal":{
+        "object_type": "block",
+        "count": 4,
+        "mutex": true,
+        "name_prefix": "b"
+        }
+  },
+  "predicates_pools": {
+    "all_predicates":{
+      "on-table":{
+        "count": 1,
+        "args": ["block_pool_init$0"]
+      },
+      "clear":{
+        "count": 1,
+        "args": ["block_pool_init$0+1"]
+      }      
+    },
+    "on_init":{
+        "on":{
+        "count": 3,
+        "args": ["block_pool_init$0+1", "block_pool_init$0+2"]
+      }
+    },
+    "on_goal":{
+      "on":{
+      "count": 1,
+      "args": ["block_pool_goal", "block_pool_goal"]
+      }
+    }
+  },
+  "constant_initial_state": "(arm-empty)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates", "on_init"]
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["on_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}

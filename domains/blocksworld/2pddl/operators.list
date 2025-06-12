@@ -1,0 +1,538 @@
+Name:
+(START):
+	Preconditions:
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON-TABLE B4)
+		(ON B1 B4)
+		(ON B3 B1)
+		(ON B2 B3)
+	Deletes:
+Cost: 0
+Name:
+(END):
+	Preconditions:
+		(ON B3 B2)
+	Adds:
+		GOAL
+	Deletes:
+Cost: 0
+Name:
+(PICKUP B1):
+	Preconditions:
+		(ARM-EMPTY)
+		(ON-TABLE B1)
+		(CLEAR B1)
+	Adds:
+		(HOLDING B1)
+	Deletes:
+		(CLEAR B1)
+		(ON-TABLE B1)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B4 B4):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B4)
+		(ON B4 B4)
+	Adds:
+		(HOLDING B4)
+	Deletes:
+		(ON B4 B4)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B4 B3):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B4)
+		(ON B4 B3)
+	Adds:
+		(HOLDING B4)
+		(CLEAR B3)
+	Deletes:
+		(ON B4 B3)
+		(CLEAR B4)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B4 B2):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B4)
+		(ON B4 B2)
+	Adds:
+		(HOLDING B4)
+		(CLEAR B2)
+	Deletes:
+		(ON B4 B2)
+		(CLEAR B4)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B4 B1):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B4)
+		(ON B4 B1)
+	Adds:
+		(HOLDING B4)
+		(CLEAR B1)
+	Deletes:
+		(ON B4 B1)
+		(CLEAR B4)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B3 B4):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B3)
+		(ON B3 B4)
+	Adds:
+		(HOLDING B3)
+		(CLEAR B4)
+	Deletes:
+		(ON B3 B4)
+		(CLEAR B3)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B2 B4):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON B2 B4)
+	Adds:
+		(HOLDING B2)
+		(CLEAR B4)
+	Deletes:
+		(ON B2 B4)
+		(CLEAR B2)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B1 B3):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B1)
+		(ON B1 B3)
+	Adds:
+		(HOLDING B1)
+		(CLEAR B3)
+	Deletes:
+		(ON B1 B3)
+		(CLEAR B1)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B1 B2):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B1)
+		(ON B1 B2)
+	Adds:
+		(HOLDING B1)
+		(CLEAR B2)
+	Deletes:
+		(ON B1 B2)
+		(CLEAR B1)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B1 B1):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B1)
+		(ON B1 B1)
+	Adds:
+		(HOLDING B1)
+	Deletes:
+		(ON B1 B1)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(STACK B4 B4):
+	Preconditions:
+		(HOLDING B4)
+		(CLEAR B4)
+	Adds:
+		(ARM-EMPTY)
+		(ON B4 B4)
+	Deletes:
+		(HOLDING B4)
+Cost: 1
+Name:
+(STACK B4 B3):
+	Preconditions:
+		(HOLDING B4)
+		(CLEAR B3)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B4)
+		(ON B4 B3)
+	Deletes:
+		(CLEAR B3)
+		(HOLDING B4)
+Cost: 1
+Name:
+(STACK B4 B2):
+	Preconditions:
+		(HOLDING B4)
+		(CLEAR B2)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B4)
+		(ON B4 B2)
+	Deletes:
+		(CLEAR B2)
+		(HOLDING B4)
+Cost: 1
+Name:
+(STACK B4 B1):
+	Preconditions:
+		(HOLDING B4)
+		(CLEAR B1)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B4)
+		(ON B4 B1)
+	Deletes:
+		(CLEAR B1)
+		(HOLDING B4)
+Cost: 1
+Name:
+(STACK B3 B4):
+	Preconditions:
+		(HOLDING B3)
+		(CLEAR B4)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B3)
+		(ON B3 B4)
+	Deletes:
+		(CLEAR B4)
+		(HOLDING B3)
+Cost: 1
+Name:
+(STACK B2 B4):
+	Preconditions:
+		(HOLDING B2)
+		(CLEAR B4)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON B2 B4)
+	Deletes:
+		(CLEAR B4)
+		(HOLDING B2)
+Cost: 1
+Name:
+(STACK B1 B4):
+	Preconditions:
+		(HOLDING B1)
+		(CLEAR B4)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B1)
+		(ON B1 B4)
+	Deletes:
+		(CLEAR B4)
+		(HOLDING B1)
+Cost: 1
+Name:
+(STACK B1 B3):
+	Preconditions:
+		(HOLDING B1)
+		(CLEAR B3)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B1)
+		(ON B1 B3)
+	Deletes:
+		(CLEAR B3)
+		(HOLDING B1)
+Cost: 1
+Name:
+(STACK B1 B2):
+	Preconditions:
+		(HOLDING B1)
+		(CLEAR B2)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B1)
+		(ON B1 B2)
+	Deletes:
+		(CLEAR B2)
+		(HOLDING B1)
+Cost: 1
+Name:
+(STACK B1 B1):
+	Preconditions:
+		(HOLDING B1)
+		(CLEAR B1)
+	Adds:
+		(ARM-EMPTY)
+		(ON B1 B1)
+	Deletes:
+		(HOLDING B1)
+Cost: 1
+Name:
+(PUTDOWN B4):
+	Preconditions:
+		(HOLDING B4)
+	Adds:
+		(CLEAR B4)
+		(ARM-EMPTY)
+		(ON-TABLE B4)
+	Deletes:
+		(HOLDING B4)
+Cost: 1
+Name:
+(PUTDOWN B1):
+	Preconditions:
+		(HOLDING B1)
+	Adds:
+		(CLEAR B1)
+		(ARM-EMPTY)
+		(ON-TABLE B1)
+	Deletes:
+		(HOLDING B1)
+Cost: 1
+Name:
+(PICKUP B4):
+	Preconditions:
+		(ARM-EMPTY)
+		(ON-TABLE B4)
+		(CLEAR B4)
+	Adds:
+		(HOLDING B4)
+	Deletes:
+		(CLEAR B4)
+		(ON-TABLE B4)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(PICKUP B3):
+	Preconditions:
+		(ARM-EMPTY)
+		(ON-TABLE B3)
+		(CLEAR B3)
+	Adds:
+		(HOLDING B3)
+	Deletes:
+		(CLEAR B3)
+		(ON-TABLE B3)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(PICKUP B2):
+	Preconditions:
+		(ARM-EMPTY)
+		(ON-TABLE B2)
+		(CLEAR B2)
+	Adds:
+		(HOLDING B2)
+	Deletes:
+		(CLEAR B2)
+		(ON-TABLE B2)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B3 B3):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B3)
+		(ON B3 B3)
+	Adds:
+		(HOLDING B3)
+	Deletes:
+		(ON B3 B3)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B3 B2):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B3)
+		(ON B3 B2)
+	Adds:
+		(HOLDING B3)
+		(CLEAR B2)
+	Deletes:
+		(ON B3 B2)
+		(CLEAR B3)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B2 B2):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON B2 B2)
+	Adds:
+		(HOLDING B2)
+	Deletes:
+		(ON B2 B2)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B2 B1):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON B2 B1)
+	Adds:
+		(HOLDING B2)
+		(CLEAR B1)
+	Deletes:
+		(ON B2 B1)
+		(CLEAR B2)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B1 B4):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B1)
+		(ON B1 B4)
+	Adds:
+		(HOLDING B1)
+		(CLEAR B4)
+	Deletes:
+		(ON B1 B4)
+		(CLEAR B1)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(STACK B3 B3):
+	Preconditions:
+		(HOLDING B3)
+		(CLEAR B3)
+	Adds:
+		(ARM-EMPTY)
+		(ON B3 B3)
+	Deletes:
+		(HOLDING B3)
+Cost: 1
+Name:
+(STACK B3 B2):
+	Preconditions:
+		(HOLDING B3)
+		(CLEAR B2)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B3)
+		(ON B3 B2)
+	Deletes:
+		(CLEAR B2)
+		(HOLDING B3)
+Cost: 1
+Name:
+(STACK B3 B1):
+	Preconditions:
+		(HOLDING B3)
+		(CLEAR B1)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B3)
+		(ON B3 B1)
+	Deletes:
+		(CLEAR B1)
+		(HOLDING B3)
+Cost: 1
+Name:
+(STACK B2 B3):
+	Preconditions:
+		(HOLDING B2)
+		(CLEAR B3)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON B2 B3)
+	Deletes:
+		(CLEAR B3)
+		(HOLDING B2)
+Cost: 1
+Name:
+(STACK B2 B2):
+	Preconditions:
+		(HOLDING B2)
+		(CLEAR B2)
+	Adds:
+		(ARM-EMPTY)
+		(ON B2 B2)
+	Deletes:
+		(HOLDING B2)
+Cost: 1
+Name:
+(STACK B2 B1):
+	Preconditions:
+		(HOLDING B2)
+		(CLEAR B1)
+	Adds:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON B2 B1)
+	Deletes:
+		(CLEAR B1)
+		(HOLDING B2)
+Cost: 1
+Name:
+(PUTDOWN B3):
+	Preconditions:
+		(HOLDING B3)
+	Adds:
+		(CLEAR B3)
+		(ARM-EMPTY)
+		(ON-TABLE B3)
+	Deletes:
+		(HOLDING B3)
+Cost: 1
+Name:
+(PUTDOWN B2):
+	Preconditions:
+		(HOLDING B2)
+	Adds:
+		(CLEAR B2)
+		(ARM-EMPTY)
+		(ON-TABLE B2)
+	Deletes:
+		(HOLDING B2)
+Cost: 1
+Name:
+(UNSTACK B3 B1):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B3)
+		(ON B3 B1)
+	Adds:
+		(HOLDING B3)
+		(CLEAR B1)
+	Deletes:
+		(ON B3 B1)
+		(CLEAR B3)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+(UNSTACK B2 B3):
+	Preconditions:
+		(ARM-EMPTY)
+		(CLEAR B2)
+		(ON B2 B3)
+	Adds:
+		(HOLDING B2)
+		(CLEAR B3)
+	Deletes:
+		(ON B2 B3)
+		(CLEAR B2)
+		(ARM-EMPTY)
+Cost: 1
+Name:
+dummy:
+	Preconditions:
+	Adds:
+	Deletes:
+Cost: 1

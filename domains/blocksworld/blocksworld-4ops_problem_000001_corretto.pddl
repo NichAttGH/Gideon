@@ -1,0 +1,8 @@
+(define (problem blocksworld-4ops_problem_000001)
+    (:domain blocksworld-4ops)
+    (:requirements :action-costs :strips :typing)
+    (:objects b0 b1 b2 b3 - block)
+    (:init (= (total-cost) 0.0) (arm-empty) (clear b2) (on b0 b1) (on b2 b3) (on b3 b0) (on-table b1))
+    (:goal (on b3 b0))
+    (:metric minimize (total-cost))
+)
