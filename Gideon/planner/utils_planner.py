@@ -451,7 +451,7 @@ def find_planner_and_validate_paths(planner):
     start_path = __file__
 
     # Name of the target directory
-    target_directory = "Project"
+    target_directory = "Gideon"
 
     # Find the parent path before the target directory
     parent_path = find_parent_before_directory(start_path, target_directory)
