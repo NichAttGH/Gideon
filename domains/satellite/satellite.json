@@ -1,0 +1,87 @@
+{
+  "problem_prefix": "satellite",
+  "domain_name": "satellite",
+  "objects_pools": {
+      "satellite_pool":{
+        "object_type": "satellite",
+        "count": 10,
+        "sequential": true,
+        "name_prefix": "s"
+        },
+      "instrument_pool":{
+        "object_type": "instrument",
+        "count": 20,
+        "sequential": true,
+        "name_prefix": "i"
+      },
+      "mode_pool":{
+        "object_type": "mode",
+        "count": 51,
+        "unique": 3,
+        "name_prefix": "m"
+      },
+      "direction_pool":{
+        "object_type": "direction",
+        "count": 10,
+        "name_prefix": "d"
+      }
+  },
+  "predicates_pools": {
+    "all_predicates_init":{
+      "pointing":{
+        "count": 10,
+        "args": ["satellite_pool$0", "direction_pool"]
+      },
+      "power_avail":{
+        "count": 10,
+        "args": ["satellite_pool$0"]
+      },
+      "calibration_target":{
+        "count": 20,
+        "args": ["instrument_pool", "direction_pool"]
+      },
+      "on_board":{
+        "count": 20,
+        "args": ["instrument_pool", "satellite_pool"]
+      },
+      "supports":{
+        "count": [20, 51],
+        "args": ["instrument_pool", "mode_pool"]
+      }
+    },
+    "all_predicates_goal":{
+      "pointing":{
+        "count": [1, 10],
+        "args": ["satellite_pool", "direction_pool"]
+      },
+      "have_image":{
+        "count": [1, 30],
+        "args": ["direction_pool", "mode_pool"]
+      }
+    }
+  },
+  "constant_initial_state": "",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_init"]
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}

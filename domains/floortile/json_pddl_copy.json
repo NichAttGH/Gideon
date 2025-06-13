@@ -1,0 +1,76 @@
+{
+  "problem_prefix": "floor-tile",
+  "domain_name": "floor-tile",
+  "objects_pools": {
+      "tile_pool":{
+        "object_type": "tile",
+        "count": [3, 3],
+        "sequential": true,
+        "name_prefix": "tile",
+        "is_grid": true
+        },
+      "robot_pool":{
+        "object_type": "robot",
+        "count": 2,
+        "mutex": true,
+        "name_prefix": "r"
+      },
+      "color_pool":{
+        "object_type": "color",
+        "count": 6,
+        "mutex": true,
+        "unique":2,
+        "name_prefix": "c"
+      }
+  },
+  "predicates_pools": {
+    "all_predicates":{
+      "robot-at":{
+        "count": 2,
+        "args": ["robot_pool$0", "tile_pool$0"]
+      },
+      "clear":{
+        "count": 7,
+        "args": ["tile_pool$0+2"]
+      },
+      "robot-has":{
+        "count": 2,
+        "args": ["robot_pool", "color_pool"]
+      },
+      "available-color": {
+        "count": 2,
+        "args": ["color_pool"]
+      }
+    },
+    "painted_goal":{
+      "painted":{
+      "count": 6,
+      "args": ["tile_pool", "color_pool"]
+      }
+    }
+  },
+  "constant_initial_state": "(up tile_1-0 tile_0-0) (up tile_1-1 tile_0-1) (up tile_1-2 tile_0-2) (up tile_2-0 tile_1-0) (up tile_2-1 tile_1-1) (up tile_2-2 tile_1-2) (down tile_0-0 tile_1-0) (down tile_0-1 tile_1-1) (down tile_0-2 tile_1-2) (down tile_1-0 tile_2-0) (down tile_1-1 tile_2-1) (down tile_1-2 tile_2-2) (right tile_0-1 tile_0-0) (right tile_0-2 tile_0-1) (right tile_1-1 tile_1-0) (right tile_1-2 tile_1-1) (right tile_2-1 tile_2-0) (right tile_2-2 tile_2-1) (left tile_0-0 tile_0-1) (left tile_0-1 tile_0-2) (left tile_1-0 tile_1-1) (left tile_1-1 tile_1-2) (left tile_2-0 tile_2-1) (left tile_2-1 tile_2-2)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [["all_predicates"]],
+      "mutex_prob": [],
+      "pools": []
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["painted_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}
