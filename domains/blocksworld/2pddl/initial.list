@@ -1,7 +1,0 @@
-Initial state:
-(ARM-EMPTY)
-(CLEAR B2)
-(ON-TABLE B4)
-(ON B1 B4)
-(ON B3 B1)
-(ON B2 B3)
