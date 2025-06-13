@@ -55,7 +55,7 @@
     }
   },
   "metric": { //optional
-    "optimize": "<min> or <max>",
-    "function": <function_name>
+    "optimize": "<min> or <max>", // Choice from Minimize and Maximize
+    "function": <function_name> // Name of the function to Minimize/Maximize
   }
 }
