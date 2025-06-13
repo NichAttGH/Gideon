@@ -9,44 +9,44 @@
         },
       "vehicle_pool":{
         "object_type": "vehicle",
-        "count": 4,
+        "count": 6,
         "mutex": true,
         "name_prefix": "v"
       },
       "package_pool":{
         "object_type": "package",
-        "count": 5,
+        "count": 15,
         "mutex": true,
         "name_prefix": "p"
       },
       "location_pool":{
         "object_type": "location",
-        "count": 8,
+        "count": 15,
         "name_prefix": "l"
       }
   },
   "predicates_pools": {
     "all_predicates_init":{
       "capacity":{
-        "count": 4,
+        "count": 6,
         "args": ["vehicle_pool", "size_pool"]
       },
       "atv":{
-        "count": 4,
+        "count": 6,
         "args": ["vehicle_pool", "location_pool"]
       },
       "atp":{
-        "count": 5,
+        "count": 15,
         "args": ["package_pool", "location_pool"]
       },
       "road":{
-        "count": 64,
+        "count": 200,
         "args": ["location_pool$0", "location_pool$1"]
       }
     },
     "all_predicates_goal":{
       "atp":{
-        "count": 5,
+        "count": [1, 15],
         "args": ["package_pool", "location_pool"]
       }
     }

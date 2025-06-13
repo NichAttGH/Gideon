@@ -4,7 +4,7 @@
   "objects_pools": {
       "block_pool":{
         "object_type": "block",
-        "count": 8,
+        "count": 24,
         "mutex": true,
         "sequential": true,
         "name_prefix": "b"
@@ -13,30 +13,30 @@
   "predicates_pools": {
     "all_predicates_init":{
       "on-table":{
-        "count": 2,
+        "count": 6,
         "args": ["block_pool$0"]
       },
       "clear":{
-        "count": 2,
+        "count": 6,
         "args": ["block_pool$0+1"]
       },
       "on":{
-        "count": 6,
-        "args": ["block_pool$0+2", "block_pool$0+3"]
+        "count": 18,
+        "args": ["block_pool$0+6", "block_pool$0+7"]
       }
     },
     "all_predicates_goal":{
       "on-table":{
-        "count": 2,
+        "count": 6,
         "args": ["block_pool$1"]
       },
       "clear":{
-        "count": 2,
+        "count": 6,
         "args": ["block_pool$1+1"]
       },
       "on":{
-      "count": 6,
-      "args": ["block_pool$1+2", "block_pool$1+3"]
+      "count": 18,
+      "args": ["block_pool$1+6", "block_pool$1+7"]
       }
     }
   },

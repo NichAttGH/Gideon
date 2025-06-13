@@ -198,7 +198,7 @@ if __name__ == "__main__":
     print("=" * 50)
     
     # Esempio 1: Verifica semplice (restituisce True/False o lista)
-    folder_to_check = "/home/nick/test3/full_dataset/spanner/plans"  # Cartella corrente
+    folder_to_check = "/home/nick/test3/full_dataset/transport/plans"  # Cartella corrente
     
     print(f"\n1️⃣ Verifica semplice in '{folder_to_check}':")
     try:
