@@ -7,6 +7,8 @@
       "mutex": true or false, // if true, objects can be used only once
       "sequential": true or false, // if true, objects are used in sequence, else they are used randomly, default false
       "count": <integer> or [<min>, <max>], // how many objects of this type to generate in this pool
+      "unique": <integer>, // how many objects of this type are unique (example: if we have obj1, obj1, obj2, obj2, obj3 -> then obj1, obj2 and obj3 are the unique ones)
+      "is_grid": true or false, // if true, objects are used as a matrix (obj0-1, obj0-2, obj0-3, obj1-1, ...)
       "name_prefix": "<prefix>", // pattern to generate names, a number will be appended sequentially starting from 1
       "name_pattern": [<start>, <increment>] // optional alternative pattern to generate names, both integers    
     },
@@ -39,7 +41,7 @@
     },
     "functions": {
       // Specifications for functions
-      "<function_name>": <float> or [<min>, <max>],
+      "<function_name>": <int> or [<min>, <max>],
       //...
     }
   },

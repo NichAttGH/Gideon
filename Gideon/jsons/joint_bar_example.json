@@ -11,6 +11,7 @@
     },
     "link_pool": {
       "object_type": "link",
+      "mutex": true,
       "sequential": true,
       "count": 4,
       "name_prefix": "link"
@@ -84,8 +85,11 @@
   "init_state": {
     "predicates": {
       "mutex_pools": [["grasped", "not-grasped"]],
-      "mutex_prob": [[0.7, 0.3]],
+      "mutex_prob": [[1.0, 0.0]],
       "pools": ["angle_joint_init"] 
+    },
+    "functions": {
+      "total-cost": 0
     }
   },
   "constant_goal_state": "",
@@ -94,6 +98,11 @@
       "mutex_pools": [],
       "mutex_prob": [],
       "pools": ["angle_joint_goal"] 
-    }
+    },
+    "functions":{}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
   }
 }
