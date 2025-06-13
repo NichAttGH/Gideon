@@ -457,8 +457,8 @@ def find_planner_and_validate_paths(planner):
     parent_path = find_parent_before_directory(start_path, target_directory)
 
     if parent_path:
-        origin_planners = "Project/planner/planners_and_val"
-        origin_validate = "Project/planner/planners_and_val/VAL/build/linux64/Release/bin/Validate"
+        origin_planners = "Gideon/planner/planners_and_val"
+        origin_validate = "Gideon/planner/planners_and_val/VAL/build/linux64/Release/bin/Validate"
         planner_path = os.path.join(parent_path, origin_planners, planner)
         validate_path = os.path.join(parent_path, origin_validate)       
     
