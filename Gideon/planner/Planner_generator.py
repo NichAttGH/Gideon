@@ -324,7 +324,7 @@ def check_val_and_move(validate_path, domain_path, problem_path, new_name, plans
 
             # Check if "success" is in the command output
             if "Successful" in stdout:
-                if "Plan size: 0" in stdout:
+                if "Value: 0" in stdout:
                     os.remove(new_name) # Delete the plan because it's empty
                     p_failed += 1
                     failed_problems.append(Path(problem_path).name)
