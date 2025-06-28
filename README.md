@@ -35,7 +35,7 @@ This framework is ideal for researchers, developers, and educators working with 
 ## Installation
 To use the framework, clone the repository and install the required libraries:
 ```bash
-git clone https://github.com/NichAttGH/Master-Thesis.git
+git clone https://github.com/NichAttGH/Gideon.git
 pip install (libraries)
 ```
 - numpy
@@ -92,7 +92,7 @@ For detailed documentation on:
 - customize problem generation, use planners, and create datasets -> Read the comments inside the code.
 
 ## License
-This project is licensed under the GNU License. See the [LICENSE](https://github.com/NichAttGH/Master-Thesis/blob/main/LICENSE) file for details.
+This project is licensed under the GNU License. See the [LICENSE](https://github.com/NichAttGH/Gideon/blob/main/LICENSE) file for details.
 
 ## Support
 If you encounter any issues or have questions, please open an issue on GitHub or contact me at nicholasattolino@gmail.com.
