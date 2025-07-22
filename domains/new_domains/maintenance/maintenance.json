@@ -1,0 +1,59 @@
+{
+  "problem_prefix": "maintenance",
+  "domain_name": "maintenance",
+  "objects_pools": {
+      "day_pool":{
+        "object_type": "day",
+        "count": 16,
+        "name_prefix": "d"
+        },
+      "airport_pool":{
+        "object_type": "airport",
+        "count": 3,
+        "name_prefix": "a"
+      },
+      "plane_pool":{
+        "object_type": "plane",
+        "count":20,
+        "name_prefix": "p"
+      }
+  },
+  "predicates_pools": {
+    "all_predicates_init":{
+      "at":{
+        "count": 36,
+        "args": ["plane_pool", "day_pool", "airport_pool"]
+      }
+    },
+    "all_predicates_goal":{
+      "done":{
+        "count": 20,
+        "args": ["plane_pool"]
+      }
+    }
+  },
+  "constant_initial_state": "(today d0)(today d1)(today d2)(today d3)(today d4)(today d5)(today d6)(today d7)(today d8)(today d9)(today d10)(today d11)(today d12)(today d13)(today d14)(today d15)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_init"]
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}
