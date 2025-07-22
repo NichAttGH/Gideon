@@ -191,7 +191,12 @@ def generate_json_predicates(dict_ordered_by_key, set_predicates):
 
                 for value in value_list:
                     if predicate.name == inner_key:
-                        if len(predicate.terms) == 2:
+                        if len(predicate.terms) == 3:
+                            obj1 = value[0]
+                            obj2 = value[1]
+                            obj3 = value[2]
+                            p = Predicate(predicate.name, obj1, obj2, obj3)
+                        elif len(predicate.terms) == 2:
                             obj1 = value[0]
                             obj2 = value[1]
                             p = Predicate(predicate.name, obj1, obj2)
