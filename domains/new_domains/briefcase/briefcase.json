@@ -1,0 +1,63 @@
+{
+  "problem_prefix": "briefcase",
+  "domain_name": "briefcase",
+  "objects_pools": {
+      "location_pool":{
+        "object_type": "location",
+        "count": 11,
+        "name_prefix": "l"
+        },
+      "portable_pool":{
+        "object_type": "portable",
+        "count": 10,
+        "mutex": true,
+        "name_prefix": "o"
+      }
+  },
+  "predicates_pools": {
+    "all_predicates_init":{
+      "at":{
+        "count": 10,
+        "args": ["portable_pool", "location_pool"]
+      },
+      "is-at":{
+        "count": 1,
+        "args": ["location_pool"]
+      }
+    },
+    "all_predicates_goal":{
+      "at":{
+        "count": 10,
+        "args": ["portable_pool", "location_pool"]
+      },
+      "is-at":{
+        "count": 1,
+        "args": ["location_pool"]
+      }
+    }
+  },
+  "constant_initial_state": "",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_init"]
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}
