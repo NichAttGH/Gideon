@@ -1,0 +1,89 @@
+{
+  "problem_prefix": "spanner",
+  "domain_name": "spanner",
+  "objects_pools": {
+      "man_pool":{
+        "object_type": "man",
+        "count": 1,
+        "name_prefix": "m"
+        },
+      "nut_pool":{
+        "object_type": "nut",
+        "count": 5,
+        "mutex": true,
+        "name_prefix": "n"
+      },
+      "spanner_pool":{
+        "object_type": "spanner",
+        "count": 10,
+        "mutex": true,
+        "name_prefix": "s"
+      },
+      "location_pool":{
+        "object_type": "location",
+        "count": 10,
+        "name_prefix": "l"
+      },
+      "gate_pool":{
+        "object_type": "location",
+        "count": 5,
+        "unique": 1,
+        "name_prefix": "gate"
+      },
+      "shed_pool":{
+        "object_type": "location",
+        "count": 1,
+        "name_prefix": "shed"
+      }
+  },
+  "predicates_pools": {
+    "all_predicates_init":{
+      "atn":{
+        "count": 5,
+        "args": ["nut_pool", "gate_pool"]
+      },
+      "ats":{
+        "count": 10,
+        "args": ["spanner_pool", "location_pool"]
+      },
+      "usable":{
+        "count": 10,
+        "args": ["spanner_pool"]
+      },
+      "loose":{
+        "count": 5,
+        "args": ["nut_pool"]
+      }
+    },
+    "all_predicates_goal":{
+      "tightened":{
+        "count": [1, 5],
+        "args": ["nut_pool"]
+      }
+    }
+  },
+  "constant_initial_state": "(atm m0 shed0) (link shed0 l0) (link l9 gate0) (link l0 l1) (link l1 l2) (link l2 l3) (link l3 l4) (link l4 l5)(link l5 l6)(link l6 l7)(link l7 l8)(link l8 l9)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_init"]
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}

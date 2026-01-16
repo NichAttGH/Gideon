@@ -1,0 +1,59 @@
+{
+  "problem_prefix": "ferry",
+  "domain_name": "ferry",
+  "objects_pools": {
+      "car_pool":{
+        "object_type": "car",
+        "count": 20,
+        "mutex": true,
+        "name_prefix": "c"
+        },
+      "location_pool":{
+        "object_type": "location",
+        "count": [4, 15],
+        "name_prefix": "l"
+      }
+  },
+  "predicates_pools": {
+    "all_predicates_init":{
+      "at-ferry":{
+        "count": 1,
+        "args": ["location_pool"]
+      },
+      "at":{
+        "count": 20,
+        "args": ["car_pool", "location_pool"]
+      }
+    },
+    "all_predicates_goal":{
+      "at":{
+        "count": [4, 20],
+        "args": ["car_pool", "location_pool"]
+      }
+    }
+  },
+  "constant_initial_state": "(empty-ferry)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_init"]
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}

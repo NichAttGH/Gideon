@@ -1,0 +1,141 @@
+{
+  "problem_prefix": "rover",
+  "domain_name": "rover",
+  "objects_pools": {
+      "rover_pool":{
+        "object_type": "rover",
+        "count": 4,
+        "sequential": true,
+        "name_prefix": "rover"
+        },
+      "waypoint_pool":{
+        "object_type": "waypoint",
+        "count": 10,
+        "sequential": true,
+        "name_prefix": "waypoint"
+      },
+      "store_pool":{
+        "object_type": "store",
+        "count": 4,
+        "mutex": true,
+        "name_prefix": "store"
+      },
+      "camera_pool":{
+        "object_type": "camera",
+        "count": 4,
+        "sequential": true,
+        "name_prefix": "camera"
+      },
+      "mode_pool":{
+        "object_type": "mode",
+        "count": 3,
+        "sequential": true,
+        "name_prefix": "mode"
+      },
+      "lander_pool":{
+        "object_type": "lander",
+        "count": 1,
+        "name_prefix": "general"
+      },
+      "objective_pool":{
+        "object_type": "objective",
+        "count": [3, 10],
+        "sequential": true,
+        "name_prefix": "obj"
+      }
+  },
+  "predicates_pools": {
+    "all_predicates_init":{
+      "at_lander":{
+        "count": 1,
+        "args": ["lander_pool", "waypoint_pool"]
+      },
+      "at":{
+        "count": 4,
+        "args": ["rover_pool$0", "waypoint_pool$0"]
+      },
+      "equipped_for_soil_analysis":{
+        "count": 4,
+        "args": ["rover_pool$0"]
+      },
+      "equipped_for_rock_analysis":{
+        "count": 4,
+        "args": ["rover_pool$0"]
+      },
+      "equipped_for_imaging":{
+        "count": 4,
+        "args": ["rover_pool$0"]
+      },
+      "empty":{
+        "count": 4,
+        "args": ["store_pool"]
+      },
+      "store_of":{
+        "count": 4,
+        "args": ["store_pool$0", "rover_pool$0"]
+      },
+      "at_rock_sample":{
+        "count": [1, 10],
+        "args": ["waypoint_pool$0"]
+      },
+      "at_soil_sample":{
+        "count": [1, 10],
+        "args": ["waypoint_pool$0"]
+      },
+      "calibration_target":{
+        "count": 4,
+        "args": ["camera_pool$1", "objective_pool"]
+      },
+      "on_board":{
+        "count": 4,
+        "args": ["camera_pool$1", "rover_pool"]
+      },
+      "supports":{
+        "count": [1, 12],
+        "args": ["camera_pool$1","mode_pool"]
+      },
+      "visible_from":{
+        "count": 62,
+        "args": ["objective_pool$2", "waypoint_pool"]
+      }
+    },
+    "all_predicates_goal":{
+      "communicated_rock_data":{
+        "count": [1, 10],
+        "args": ["waypoint_pool$0"]
+      },
+      "communicated_soil_data":{
+        "count": [1, 10],
+        "args": ["waypoint_pool$0"]
+      },
+      "communicated_image_data":{
+        "count": [1, 30],
+        "args": ["objective_pool", "mode_pool"]
+      }
+    }
+  },
+  "constant_initial_state": "(visible waypoint8 waypoint6)(visible waypoint1 waypoint7)(visible waypoint5 waypoint4)(visible waypoint3 waypoint8)(visible waypoint8 waypoint3)(visible waypoint8 waypoint1)(visible waypoint6 waypoint9)(visible waypoint1 waypoint8)(visible waypoint0 waypoint6)(visible waypoint4 waypoint8)(visible waypoint1 waypoint5)(visible waypoint8 waypoint4)(visible waypoint2 waypoint8)(visible waypoint7 waypoint1)(visible waypoint8 waypoint6)(visible waypoint1 waypoint7)(visible waypoint5 waypoint0)(visible waypoint0 waypoint5)(visible waypoint6 waypoint7)(visible waypoint7 waypoint6)(visible waypoint2 waypoint5)(visible waypoint5 waypoint2)(visible waypoint2 waypoint6)(visible waypoint6 waypoint2)(visible waypoint4 waypoint8)(visible waypoint8 waypoint4)(visible waypoint0 waypoint7)(visible waypoint7 waypoint0)(visible waypoint4 waypoint6)(visible waypoint6 waypoint4)(visible waypoint3 waypoint7)(visible waypoint7 waypoint3)(visible waypoint0 waypoint8)(visible waypoint8 waypoint0)(visible waypoint4 waypoint7)(visible waypoint7 waypoint4)(visible waypoint3 waypoint6)(visible waypoint6 waypoint3)(visible waypoint0 waypoint2)(visible waypoint2 waypoint0)(visible waypoint4 waypoint9)(visible waypoint9 waypoint4)(visible waypoint3 waypoint0)(visible waypoint0 waypoint3)(visible waypoint6 waypoint0)(visible waypoint0 waypoint6)(visible waypoint5 waypoint3)(visible waypoint3 waypoint5)(visible waypoint0 waypoint9)(visible waypoint9 waypoint0)(visible waypoint4 waypoint5)(visible waypoint5 waypoint4)(visible waypoint7 waypoint0)(visible waypoint0 waypoint7)(visible waypoint5 waypoint7)(visible waypoint7 waypoint5)(visible waypoint0 waypoint3)(visible waypoint3 waypoint0)(visible waypoint2 waypoint7)(visible waypoint7 waypoint2)(visible waypoint5 waypoint8)(visible waypoint8 waypoint5)(visible waypoint3 waypoint9)(visible waypoint9 waypoint3)(visible waypoint0 waypoint4)(visible waypoint4 waypoint0)(visible waypoint7 waypoint8)(visible waypoint8 waypoint7)(visible waypoint5 waypoint6)(visible waypoint6 waypoint5)(visible waypoint9 waypoint8)(visible waypoint8 waypoint9)(visible waypoint1 waypoint8)(visible waypoint8 waypoint1)(visible waypoint3 waypoint2)(visible waypoint2 waypoint3)(visible waypoint5 waypoint1)(visible waypoint1 waypoint5)(visible waypoint5 waypoint2)(visible waypoint2 waypoint5)(visible waypoint0 waypoint1)(visible waypoint1 waypoint0)(visible waypoint9 waypoint6)(visible waypoint6 waypoint9)(visible waypoint2 waypoint4)(visible waypoint4 waypoint2)(visible waypoint9 waypoint5)(visible waypoint5 waypoint9)(visible waypoint9 waypoint1)(visible waypoint1 waypoint9)(can_traverse rover0 waypoint8 waypoint6)(can_traverse rover0 waypoint1 waypoint7)(can_traverse rover0 waypoint5 waypoint4)(can_traverse rover0 waypoint3 waypoint8)(can_traverse rover0 waypoint8 waypoint3)(can_traverse rover0 waypoint8 waypoint1)(can_traverse rover0 waypoint6 waypoint9)(can_traverse rover0 waypoint1 waypoint8)(can_traverse rover0 waypoint0 waypoint6)(can_traverse rover0 waypoint4 waypoint8)(can_traverse rover0 waypoint1 waypoint5)(can_traverse rover0 waypoint8 waypoint4)(can_traverse rover0 waypoint2 waypoint8)(can_traverse rover0 waypoint7 waypoint1)(can_traverse rover0 waypoint8 waypoint6)(can_traverse rover0 waypoint1 waypoint7)(can_traverse rover0 waypoint5 waypoint0)(can_traverse rover0 waypoint0 waypoint5)(can_traverse rover0 waypoint6 waypoint7)(can_traverse rover0 waypoint7 waypoint6)(can_traverse rover0 waypoint2 waypoint5)(can_traverse rover0 waypoint5 waypoint2)(can_traverse rover0 waypoint2 waypoint6)(can_traverse rover0 waypoint6 waypoint2)(can_traverse rover0 waypoint4 waypoint8)(can_traverse rover0 waypoint8 waypoint4)(can_traverse rover0 waypoint0 waypoint7)(can_traverse rover0 waypoint7 waypoint0)(can_traverse rover0 waypoint4 waypoint6)(can_traverse rover0 waypoint6 waypoint4)(can_traverse rover0 waypoint3 waypoint7)(can_traverse rover0 waypoint7 waypoint3)(can_traverse rover0 waypoint0 waypoint8)(can_traverse rover0 waypoint8 waypoint0) (can_traverse rover1 waypoint8 waypoint6)(can_traverse rover1 waypoint1 waypoint7)(can_traverse rover1 waypoint5 waypoint4)(can_traverse rover1 waypoint8 waypoint2)(can_traverse rover1 waypoint3 waypoint8)(can_traverse rover1 waypoint5 waypoint0)(can_traverse rover1 waypoint8 waypoint5)(can_traverse rover1 waypoint6 waypoint9)(can_traverse rover1 waypoint9 waypoint6)(can_traverse rover1 waypoint6 waypoint8)(can_traverse rover1 waypoint4 waypoint1)(can_traverse rover1 waypoint2 waypoint8)(can_traverse rover1 waypoint4 waypoint5)(can_traverse rover1 waypoint7 waypoint1)(can_traverse rover1 waypoint0 waypoint5)(can_traverse rover1 waypoint1 waypoint4)(can_traverse rover1 waypoint5 waypoint8)(can_traverse rover1 waypoint8 waypoint3)(can_traverse rover1 waypoint4 waypoint8)(can_traverse rover1 waypoint8 waypoint4)(can_traverse rover1 waypoint0 waypoint7)(can_traverse rover1 waypoint7 waypoint0)(can_traverse rover1 waypoint1 waypoint6)(can_traverse rover1 waypoint6 waypoint1)(can_traverse rover1 waypoint0 waypoint4)(can_traverse rover1 waypoint4 waypoint0)(can_traverse rover1 waypoint8 waypoint9)(can_traverse rover1 waypoint9 waypoint8)(can_traverse rover1 waypoint7 waypoint9)(can_traverse rover1 waypoint9 waypoint7)(can_traverse rover1 waypoint0 waypoint6)(can_traverse rover1 waypoint6 waypoint0)(can_traverse rover1 waypoint1 waypoint5)(can_traverse rover1 waypoint5 waypoint1) (can_traverse rover2 waypoint8 waypoint6)(can_traverse rover2 waypoint1 waypoint7)(can_traverse rover2 waypoint5 waypoint4)(can_traverse rover2 waypoint8 waypoint2)(can_traverse rover2 waypoint3 waypoint8)(can_traverse rover2 waypoint5 waypoint0)(can_traverse rover2 waypoint8 waypoint5)(can_traverse rover2 waypoint6 waypoint9)(can_traverse rover2 waypoint9 waypoint6)(can_traverse rover2 waypoint6 waypoint8)(can_traverse rover2 waypoint4 waypoint1)(can_traverse rover2 waypoint2 waypoint8)(can_traverse rover2 waypoint4 waypoint5)(can_traverse rover2 waypoint7 waypoint1)(can_traverse rover2 waypoint0 waypoint5)(can_traverse rover2 waypoint1 waypoint4)(can_traverse rover2 waypoint5 waypoint8)(can_traverse rover2 waypoint8 waypoint3)(can_traverse rover2 waypoint4 waypoint8)(can_traverse rover2 waypoint8 waypoint4)(can_traverse rover2 waypoint4 waypoint9)(can_traverse rover2 waypoint9 waypoint4)(can_traverse rover2 waypoint1 waypoint3)(can_traverse rover2 waypoint3 waypoint1)(can_traverse rover2 waypoint1 waypoint8)(can_traverse rover2 waypoint8 waypoint1)(can_traverse rover2 waypoint0 waypoint8)(can_traverse rover2 waypoint8 waypoint0)(can_traverse rover2 waypoint0 waypoint3)(can_traverse rover2 waypoint3 waypoint0)(can_traverse rover2 waypoint5 waypoint7)(can_traverse rover2 waypoint7 waypoint5)(can_traverse rover2 waypoint7 waypoint6)(can_traverse rover2 waypoint6 waypoint7) (can_traverse rover3 waypoint8 waypoint6)(can_traverse rover3 waypoint1 waypoint7)(can_traverse rover3 waypoint5 waypoint4)(can_traverse rover3 waypoint8 waypoint2)(can_traverse rover3 waypoint3 waypoint8)(can_traverse rover3 waypoint5 waypoint0)(can_traverse rover3 waypoint8 waypoint5)(can_traverse rover3 waypoint6 waypoint9)(can_traverse rover3 waypoint9 waypoint6)(can_traverse rover3 waypoint6 waypoint8)(can_traverse rover3 waypoint4 waypoint1)(can_traverse rover3 waypoint2 waypoint8)(can_traverse rover3 waypoint4 waypoint5)(can_traverse rover3 waypoint7 waypoint1)(can_traverse rover3 waypoint0 waypoint5)(can_traverse rover3 waypoint1 waypoint4)(can_traverse rover3 waypoint5 waypoint8)(can_traverse rover3 waypoint8 waypoint3)(can_traverse rover3 waypoint2 waypoint4)(can_traverse rover3 waypoint4 waypoint2)(can_traverse rover3 waypoint0 waypoint8)(can_traverse rover3 waypoint8 waypoint0)(can_traverse rover3 waypoint1 waypoint3)(can_traverse rover3 waypoint3 waypoint1)(can_traverse rover3 waypoint0 waypoint8)(can_traverse rover3 waypoint8 waypoint0)(can_traverse rover3 waypoint1 waypoint8)(can_traverse rover3 waypoint8 waypoint1)(can_traverse rover3 waypoint2 waypoint4)(can_traverse rover3 waypoint4 waypoint2)(can_traverse rover3 waypoint0 waypoint8)(can_traverse rover3 waypoint8 waypoint0)(can_traverse rover3 waypoint1 waypoint3)(can_traverse rover3 waypoint3 waypoint1)(can_traverse rover3 waypoint3 waypoint6)(can_traverse rover3 waypoint6 waypoint3)(can_traverse rover3 waypoint2 waypoint8)(can_traverse rover3 waypoint8 waypoint2)",
+  "init_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_init"]
+    },
+    "functions": {
+      "total-cost": 0.0
+    }
+  },
+  "constant_goal_state": "",
+  "goal_state": {
+    "predicates": {
+      "mutex_pools": [],
+      "mutex_prob": [],
+      "pools": ["all_predicates_goal"]
+    },
+    "functions": {}
+  },
+  "metric": {
+    "optimize": "minimize",
+    "function": "total-cost"
+  }
+}
