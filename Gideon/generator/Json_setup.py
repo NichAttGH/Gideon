@@ -25,10 +25,12 @@ class ObjectPool:
     - unique (int): Number of unique objects in the pool.
     - name_prefix (str): The prefix for naming created objects.
     - name_pattern (List[int]): A pattern for naming objects.
+    - is_grid (bool): If True and count is [rows, cols], creates grid layout.
     - created_objects (List[Constant]): The list of created objects.
     """
     def __init__(self, object_type: str, count: Union[int, List[int]], name_prefix: str, mutex: bool = False,
                  sequential: bool = False, unique: int = None, name_pattern: List[int] = None, is_grid: bool = False, created_objects: List[Constant] = []):
+        """Initializes an ObjectPool instance."""
         self.object_type = object_type
         self.mutex = mutex
         self.sequential = sequential
@@ -43,7 +45,7 @@ class ObjectPool:
         """Returns a string representation of the ObjectPool."""
         return (f"ObjectPool(object_type = {self.object_type}, mutex = {self.mutex}, sequential = {self.sequential}, "
                 f"count = {self.count}, unique = {self.unique}, name_prefix = {self.name_prefix}, \n"
-                f" name_pattern = {self.name_pattern}, created_objects = {self.created_objects})")
+                f" name_pattern = {self.name_pattern}, is_grid = {self.is_grid}, created_objects = {self.created_objects})")
     
     def __repr__(self):
         """Returns the string representation for the ObjectPool."""
@@ -60,6 +62,7 @@ class PredicateStructure:
     - probability (float): The probability of the predicate being selected (default 1.0).
     """
     def __init__(self, name: str, count: Union[int, List[int]], args: list, probability: float = 1.0):
+        """Initializes a PredicateStructure instance."""
         self.name = name
         self.count = count
         self.args = args
@@ -68,9 +71,11 @@ class PredicateStructure:
     def get_actual_count(self):
         """
         Returns the actual count, resolving random range if needed.
+        If count is a list [min, max], selects a random integer in that range.
+        Otherwise returns the fixed count value.
         
         Returns:
-            int: The resolved count value.
+            int: The resolved count value for this predicate instance.
         """
         if isinstance(self.count, list):
             return random.randint(self.count[0], self.count[1])
@@ -107,6 +112,10 @@ class PredicatePool:
     - predicates (dict): A dictionary of predicates in the pool.
     """
     def __init__(self, name: str, predicates: dict):
+        """
+        Initializes a PredicatePool instance.
+        Converts raw predicate dictionaries into PredicateStructure objects.
+        """
         self.name = name
         self.predicates = {key: PredicateStructure(key, **value) for key, value in predicates.items()}
 
@@ -128,6 +137,10 @@ class FunctionStructure:
     - value (float): The value of the function.
     """
     def __init__(self, function_name: str, function_value: float):
+        """
+        Initializes a FunctionStructure instance.
+        Used to represent numeric functions in PDDL (e.g., for metrics or costs).
+        """
         self.name = function_name
         self.value = function_value
     
@@ -150,6 +163,10 @@ class InitState:
     - functions (list): List of functions in the initial state.
     """
     def __init__(self, init_state: dict):
+        """
+        Initializes an InitState instance from a configuration dictionary.
+        Extracts predicate pools and functions to define the initial problem state.
+        """
         # Extract predicates from the field 'predicates'
         predicates = init_state.get("predicates", {})
         self.mutex_pools = predicates.get("mutex_pools", [])
@@ -177,8 +194,13 @@ class GoalState:
     - mutex_pools (list): List of mutex pools in the goal state.
     - mutex_prob (list): List of probabilities for mutex pools.
     - pools (list): List of object pools in the goal state.
+    - functions (list): List of functions in the goal state.
     """
     def __init__(self, g_state: dict):
+        """
+        Initializes a GoalState instance from a configuration dictionary.
+        Defines the target state that the planner should achieve.
+        """
         # Extract predicates from the field 'predicates'
         predicates = g_state.get("predicates", {})
         self.mutex_pools = predicates.get("mutex_pools", [])
@@ -207,6 +229,10 @@ class MetricStructure:
     - function (str): The name of the function to be optimized.
     """
     def __init__(self, optimize: str, function_name: str):
+        """
+        Initializes a MetricStructure instance.
+        Defines the optimization objective for the PDDL problem.
+        """
         self.optimization = optimize
         self.function = function_name
     
@@ -235,6 +261,7 @@ class JsonSchema:
     """
     def __init__(self, problem_prefix: str, domain_name: str, objects_pools: Dict[str, ObjectPool], predicate_pools: Dict[str, PredicatePool] = None,
                  constant_initial_state: str = "", init_state: InitState = None, constant_goal_state: str = "", g_state: GoalState = None, metric: MetricStructure = None):
+        """Initializes a JsonSchema instance representing a complete PDDL problem."""
         self.problem_prefix = problem_prefix
         self.domain_name = domain_name
         self.objects_pools = objects_pools
@@ -265,7 +292,6 @@ class JsonSchema:
     def generate_objects(self):
         """
         Generates objects based on the defined object pools.
-
         This method populates the created_objects attribute of each ObjectPool
         with instances of the Constant class, based on the specified count and naming conventions.
         
@@ -385,9 +411,22 @@ class JsonSchema:
     def gen_dict_ordered(self):
         """
         Generates a dictionary of predicates ordered by their keys with proper object assignment.
+        Implements advanced object selection logic including:
+        - Variable predicate count: when count is [min, max], randomly selects within range
+        - Synchronization tags ($): ensures same objects used across related predicates
+        - Offset expressions ($tag+n, $tag-n): selects objects relative to synchronized base
+        - Mutex constraints: prevents object reuse within predicates (local and global)
+        - Sequential selection: picks objects in order with optional wrapping
+        - Probability filtering: only generates predicates based on their probability value
         
-        Now supports variable predicate count: when count is [min, max], a random value 
-        in that range is selected for each predicate.
+        The method performs two passes:
+        1. Pre-allocates synchronized object selections for all $tags
+        2. Generates actual predicate instances using allocated objects
+        
+        Returns:
+            dict: Nested dictionary structure:
+                  {pool_name: {predicate_name: [[obj1, obj2, ...], ...]}}
+                  where each inner list represents arguments for one predicate instance.
         """
         dict_ordered_by_key = dict()
         global_sync_selections = {}
@@ -416,11 +455,10 @@ class JsonSchema:
                             tag_max_counts[unique_tag] = 0
                             tag_pools[unique_tag] = base_name
                         
-                        # MODIFICATO: Usa il massimo possibile per la pre-pianificazione
                         max_count = pred_structure.get_max_possible_count()
                         tag_max_counts[unique_tag] = max(tag_max_counts[unique_tag], max_count)
 
-        # Pre-generate selections for each synchronization tag (unchanged)
+        # Pre-generate selections for each synchronization tag
         for unique_tag, max_count in tag_max_counts.items():
             pool_name = tag_pools[unique_tag]
             if pool_name in self.objects_pools:
@@ -469,17 +507,16 @@ class JsonSchema:
                 if predicate_name not in dict_ordered_by_key[key]:
                     dict_ordered_by_key[key][predicate_name] = []
 
-                # NUOVO: Risolvi il count effettivo per questo predicato
+                # Solve the actual count for this predicate
                 actual_count = pred_structure.get_actual_count()
                 
-                # Optional: Debug print per vedere il count risolto
+                # Optional: Debug print to see the resolved count
                 #if isinstance(pred_structure.count, list):
                 #    print(f"Predicate {predicate_name}: count range {pred_structure.count} → resolved to {actual_count}")
 
                 # Extended mutex tracking
                 global_predicate_mutex_usage = {}
 
-                # MODIFICATO: Usa actual_count invece di pred_structure.count
                 for predicate_instance in range(actual_count):
                     if pred_structure.probability < 1.0 and random.random() > pred_structure.probability:
                         continue
@@ -570,7 +607,7 @@ class JsonSchema:
                                                 raise ValueError(f"Pool {base_name}: no objects available "
                                                             f"with global mutex. Pool too small.")
 
-                                # Object selection logic (unchanged)
+                                # Object selection logic
                                 if pool_obj.sequential:
                                     if predicate_sequential_state[base_name] is None:
                                         current_index = random.choice(available_indices)
@@ -640,7 +677,10 @@ def get_effective_pool(pool_obj):
 def load_json(filepath: str):
     """
     Loads a JSON file and creates instances of the relevant classes.
-
+    This function parses a JSON configuration file and instantiates all necessary
+    objects for a PDDL problem schema, including object pools, predicate pools,
+    initial state, and goal state.
+    
     Parameters:
         - filepath (str): The path to the JSON file to be loaded.
 
@@ -682,4 +722,5 @@ def load_json(filepath: str):
         g_state=g_state,
         metric=data["metric"]
     )
+
     return json_schema
