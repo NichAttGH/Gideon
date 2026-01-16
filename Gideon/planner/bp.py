@@ -9,7 +9,7 @@ from utils_planner import Planner_Structure, read_problems, find_planner_and_val
 
 # Project metadata
 __author__ = "Nicholas Attolino"
-__copyright__ = "Copyright 2025, Nicholas Attolino"
+__copyright__ = "Copyright 2026, Nicholas Attolino"
 __license__ = "GNU"
 __version__ = "1.1.0"
 __maintainer__ = "Nicholas Attolino"
