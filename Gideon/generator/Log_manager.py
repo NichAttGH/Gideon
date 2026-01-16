@@ -17,7 +17,7 @@ import os
 
 # Project metadata
 __author__ = "Nicholas Attolino"
-__copyright__ = "Copyright 2025, Nicholas Attolino"
+__copyright__ = "Copyright 2026, Nicholas Attolino"
 __license__ = "GNU"
 __version__ = "1.1.0"
 __maintainer__ = "Nicholas Attolino"
@@ -67,4 +67,5 @@ class Log_Manager:
         with open(log_file_path, 'w') as log_file:
             log_file.write(f"Number of generated problems: {i}\n")
             log_file.write(f"Directory of generated problems: {problems_path}\n")
+
             log_file.write(f"Time required to generate problems: {t:.2f} seconds")
