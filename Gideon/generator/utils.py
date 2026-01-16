@@ -5,7 +5,7 @@ from pathlib import Path    # Handling paths if num_problems == 1
 
 # Project metadata
 __author__ = "Nicholas Attolino"
-__copyright__ = "Copyright 2025, Nicholas Attolino"
+__copyright__ = "Copyright 2026, Nicholas Attolino"
 __license__ = "GNU"
 __version__ = "1.1.0"
 __maintainer__ = "Nicholas Attolino"
@@ -96,4 +96,5 @@ def final_output(i, t, problems_path):
     """
     print(f"Number of generated problems: {i}")
     print(f"Directory of generated problems: {problems_path}")
+
     print(f"Time required to generate problems: {t:.2f} seconds")
