@@ -19,7 +19,7 @@ import hashlib
 
 # Project metadata
 __author__ = "Nicholas Attolino"
-__copyright__ = "Copyright 2025, Nicholas Attolino"
+__copyright__ = "Copyright 2026, Nicholas Attolino"
 __license__ = "GNU"
 __version__ = "1.1.0"
 __maintainer__ = "Nicholas Attolino"
@@ -123,4 +123,5 @@ def update_h_progress(progress_path, h_progress):
     
     # Rewrite the file with the new value
     with open(progress_path, 'w') as file:
+
         file.writelines(lines)
