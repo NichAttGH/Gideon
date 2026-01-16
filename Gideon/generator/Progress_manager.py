@@ -18,7 +18,7 @@ import re
 
 # Project metadata
 __author__ = "Nicholas Attolino"
-__copyright__ = "Copyright 2025, Nicholas Attolino"
+__copyright__ = "Copyright 2026, Nicholas Attolino"
 __license__ = "GNU"
 __version__ = "1.1.0"
 __maintainer__ = "Nicholas Attolino"
@@ -127,4 +127,5 @@ class Progress_Manager:
                         f.write(f"{key} = {value}\n")
                 return 0, answer
             else:
+
                 print("Invalid input, please enter 'Y' for yes or 'N' for no.")
